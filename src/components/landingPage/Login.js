@@ -12,22 +12,22 @@ export default function Login(props) {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  // useEffect(() => {
-  //   const auth = async () => {
-  //     const res = await fetch("/auth");
-  //     const data = await res.json();
-  //     if (data.msg === "Doctor Login Found") {
-  //       navigate("/doctor/dashboard");
-  //     }
-  //     if (data.msg === "Admin Login Found") {
-  //       navigate("/admin/dashboard");
-  //     }
-  //     if (data.msg === "Patient Login Found") {
-  //       navigate("/patient/dashboard");
-  //     }
-  //   };
-  //   auth();
-  // });
+  useEffect(() => {
+    const auth = async () => {
+      const res = await fetch("/auth");
+      const data = await res.json();
+      if (data.msg === "Doctor Login Found") {
+        navigate("/doctor/dashboard");
+      }
+      if (data.msg === "Admin Login Found") {
+        navigate("/admin/dashboard");
+      }
+      if (data.msg === "Patient Login Found") {
+        navigate("/patient/dashboard");
+      }
+    };
+    auth();
+  });
 
   const handlePatientLogin = async (healthID, password) => {
     setLoading(true);
