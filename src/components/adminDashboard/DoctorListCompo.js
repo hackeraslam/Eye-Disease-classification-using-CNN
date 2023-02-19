@@ -5,21 +5,6 @@ import delete_btn from "../../assets/img/dashboard/delete.png";
 const DoctorListCompo = (props) => {
   const navigate = useNavigate();
   const deleteDoctor = async () => {
-    const res = await fetch(`/deletedoctor/${props.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = res.json();
-    if (data.AuthError) {
-      props.settoastCondition({
-        status: "info",
-        message: "Please Login to proceed!!!",
-      });
-      props.setToastShow(true);
-      navigate("/");
-    }
     props.settoastCondition({
       status: "success",
       message: "Doctor Deleted Successfuly!!!",

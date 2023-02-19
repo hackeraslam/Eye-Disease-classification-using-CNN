@@ -61,23 +61,6 @@ const DoctorProfile = (props) => {
     return `${day}/${month}/${year}`;
   };
 
-  useEffect(() => {
-    async function getdoctor() {
-      const res = await fetch("/getdoctor");
-      const data = await res.json();
-      if (data.AuthError) {
-        props.settoastCondition({
-          status: "info",
-          message: "Please Login to proceed!!!",
-        });
-        props.setToastShow(true);
-      } else {
-        setDoctor(data.doctor);
-      }
-    }
-    getdoctor();
-  }, []);
-
   return (
     <body className="font-poppins col-span-10 overflow-y-scroll">
       <div className="grid grid-cols-2 mt-16">

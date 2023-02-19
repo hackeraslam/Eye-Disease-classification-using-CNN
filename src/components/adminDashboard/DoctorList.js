@@ -4,25 +4,6 @@ import DoctorListCompo from "./DoctorListCompo";
 const DoctorList = (props) => {
   const navigate = useNavigate();
   const [doctorList, setDoctorList] = useState([]);
-  useEffect(() => {
-    async function fetchDoctorList() {
-      const res = await fetch("/doctorlist", {
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.AuthError) {
-        props.settoastCondition({
-          status: "info",
-          message: "Please Login to proceed!!!",
-        });
-        props.setToastShow(true);
-        navigate("/");
-      } else {
-        setDoctorList(data.doctorlist);
-      }
-    }
-    fetchDoctorList();
-  }, [doctorList]);
 
   return (
     <div className="m-4 mt-4 font-poppins col-span-10">

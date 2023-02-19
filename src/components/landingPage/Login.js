@@ -2,8 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import profile from "../../assets/img/landingPage/profile.png";
 import ReactLoading from "react-loading";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase.ts";
+// import { Auth } from "firebase/auth";
 export default function Login(props) {
   const navigate = useNavigate();
+
   const [Loading, setLoading] = useState(false);
   const [Toggle, setToggle] = useState("Patient");
 
@@ -12,25 +16,29 @@ export default function Login(props) {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  useEffect(() => {
-    const auth = async () => {
-      const res = await fetch("/auth");
-      const data = await res.json();
-      if (data.msg === "Doctor Login Found") {
-        navigate("/doctor/dashboard");
-      }
-      if (data.msg === "Admin Login Found") {
-        navigate("/admin/dashboard");
-      }
-      if (data.msg === "Patient Login Found") {
-        navigate("/patient/dashboard");
-      }
-    };
-    auth();
-  });
+  // useMountEffect(() => {
+  //   window.location.reload(false);
+  // });
+  // useEffect(() => {
+  //   const auths = async () => {
+  //     const res = await fetch("/auth");
+  //     const data = await res.json();
+  //     if (data.msg === "Doctor Login Found") {
+  //       navigate("/doctor/dashboard");
+  //     }
+  //     if (data.msg === "Admin Login Found") {
+  //       navigate("/admin/dashboard");
+  //     }
+  //     if (data.msg === "Patient Login Found") {
+  //       navigate("/patient/dashboard");
+  //     }
+  //   };
+  //   auths();
+  // });
 
   const handlePatientLogin = async (healthID, password) => {
     setLoading(true);
+
     // const res = await fetch("/login/patient", {
     //   method: "POST",
     //   headers: {
@@ -54,8 +62,8 @@ export default function Login(props) {
     //     status: "success",
     //     message: "Logged in Successfully!!!",
     //   });
-    props.setToastShow(true);
-    navigate("/patient/dashboard");
+    // props.setToastShow(true);
+    // navigate("/patient/dashboard");
     // }
   };
 
@@ -108,13 +116,59 @@ export default function Login(props) {
     e.preventDefault();
     switch (Toggle) {
       case "Patient":
-        handlePatientLogin(username, password);
+        await signInWithEmailAndPassword(auth, username, password)
+          .then(() => {
+            setLoading(false);
+            navigate("/patient/dashboard");
+            props.settoastCondition({
+              status: "success",
+              message: "Logged in Successfully!!!",
+            });
+            props.setToastShow(true);
+          })
+          .catch((error) => {
+            // navigate("/");
+            // setUsernameError(error);
+            // setPasswordError(error);
+            setLoading(false);
+          });
+
         break;
       case "Doctor":
-        handleDoctorAdminLogin(username, password, "/login/doctor");
+        await signInWithEmailAndPassword(auth, username, password)
+          .then(() => {
+            setLoading(false);
+            navigate("/doctor/dashboard");
+            props.settoastCondition({
+              status: "success",
+              message: "Logged in Successfully!!!",
+            });
+            props.setToastShow(true);
+          })
+          .catch((error) => {
+            // navigate("/");
+            // setUsernameError(error);
+            // setPasswordError(error);
+            setLoading(false);
+          });
         break;
       case "Admin":
-        handleDoctorAdminLogin(username, password, "/login/admin");
+        await signInWithEmailAndPassword(auth, username, password)
+          .then(() => {
+            setLoading(false);
+            navigate("/admin/dashboard");
+            props.settoastCondition({
+              status: "success",
+              message: "Logged in Successfully!!!",
+            });
+            props.setToastShow(true);
+          })
+          .catch((error) => {
+            // navigate("/");
+            // setUsernameError(error);
+            // setPasswordError(error);
+            setLoading(false);
+          });
         break;
       default:
         break;

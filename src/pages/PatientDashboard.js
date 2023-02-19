@@ -60,26 +60,26 @@ const PatientDashboard = (props) => {
     let year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-  useEffect(() => {
-    async function getpatient() {
-      const res = await fetch("/getpatient");
-      const data = await res.json();
-      if (data.AuthError) {
-        props.settoastCondition({
-          status: "info",
-          message: "Please Login to proceed!!!",
-        });
-        props.setToastShow(true);
-        navigate("/");
-      } else {
-        setPatient(data.patient);
-        if (data.patient.prescriptions) {
-          setPrescriptions(data.patient.prescriptions.reverse());
-        }
-      }
-    }
-    getpatient();
-  }, [dob]);
+  // useEffect(() => {
+  //   async function getpatient() {
+  //     const res = await fetch("/getpatient");
+  //     const data = await res.json();
+  //     if (data.AuthError) {
+  //       props.settoastCondition({
+  //         status: "info",
+  //         message: "Please Login to proceed!!!",
+  //       });
+  //       props.setToastShow(true);
+  //       navigate("/");
+  //     } else {
+  //       setPatient(data.patient);
+  //       if (data.patient.prescriptions) {
+  //         setPrescriptions(data.patient.prescriptions.reverse());
+  //       }
+  //     }
+  //   }
+  //   getpatient();
+  // }, [dob]);
 
   return (
     <div className="full-body col-span-10 h-screen">

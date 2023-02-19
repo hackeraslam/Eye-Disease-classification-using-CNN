@@ -5,33 +5,6 @@ import delete_btn from "../../assets/img/dashboard/delete.png";
 const PatientListCompo = (props) => {
   const navigate = useNavigate();
   const [dob, setDob] = useState("");
-  // useEffect(() => {
-  //   const date = new Date(props.patient.dob);
-  //   setDob(`${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`);
-  // }, []);
-
-  // const deletePatient = async () => {
-  //   const res = await fetch(`/deletepatient/${props.healthID}`, {
-  //     method: "DELETE",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  //   const data = res.json();
-  //   if (data.AuthError) {
-  //     props.settoastCondition({
-  //       status: "info",
-  //       message: "Please Login to proceed!!!",
-  //     });
-  //     props.setToastShow(true);
-  //     navigate("/");
-  //   }
-  //   props.settoastCondition({
-  //     status: "success",
-  //     message: "Patient Deleted Successfuly!!!",
-  //   });
-  //   props.setToastShow(true);
-  // };
 
   return (
     <div className="grid grid-cols-9">
