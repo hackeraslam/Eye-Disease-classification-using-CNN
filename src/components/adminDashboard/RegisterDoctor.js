@@ -11,20 +11,8 @@ export default function Register(props) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [EducationList, setEducationList] = useState([{ degree: "" }]);
   const [passwordError, setPasswordError] = useState("");
-  // const [errors, setErrors] = useState({});
-  // const handelEducationAdd = () => {
-  //   const EducationList1 = [...EducationList];
-  //   EducationList1.push({ degree: "" });
-  //   setEducationList(EducationList1);
-  // };
 
   const [SpecialityList, setSpecialityList] = useState([{ special: "" }]);
-
-  // const handelSpecialityAdd = () => {
-  //   const SpecialityList1 = [...SpecialityList];
-  //   SpecialityList1.push({ special: "" });
-  //   setSpecialityList(SpecialityList1);
-  // };
 
   const [doctor, setDoctor] = useState({
     name: {

@@ -47,22 +47,7 @@ const AddNewDiagnosis = (props) => {
     advices: advices,
   });
 
-  const handleAddPrescription = async (e) => {
-    // if (data.msg) {
-    //   props.settoastCondition({
-    //     status: "error",
-    //     message: "Please fill all fields properly!!!",
-    //   });
-    //   props.setToastShow(true);
-    // }
-    setLoading(false);
-    props.settoastCondition({
-      status: "success",
-      message: "Prescription Added Successfully!!!",
-    });
-    props.setToastShow(true);
-    navigate("/doctor/dashboard");
-  };
+  const handleAddPrescription = async (e) => {};
 
   return (
     <div className="font-poppins col-span-10 overflow-y-scroll">

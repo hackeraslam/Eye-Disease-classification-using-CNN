@@ -10,7 +10,6 @@ import dashboard from "../../assets/img/dashboard/dashboard.jpeg";
 const AdminSidebar = (props) => {
   const navigate = useNavigate();
   const logout = async () => {
-    const res = await fetch("/logout");
     props.settoastCondition({
       status: "success",
       message: "Logged out Successfully!!!",
