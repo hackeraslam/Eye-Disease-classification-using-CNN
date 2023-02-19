@@ -6,26 +6,6 @@ const PatientList = (props) => {
   const navigate = useNavigate();
   const [patientList, setPatientList] = useState([]);
 
-  // useEffect(() => {
-  //   async function fetchPatientList() {
-  //     const res = await fetch("/patientlist", {
-  //       credentials: "include",
-  //     });
-  //     const data = await res.json();
-  //     if (data.AuthError) {
-  //       props.settoastCondition({
-  //         status: "info",
-  //         message: "Please Login to proceed!!!",
-  //       });
-  //       props.setToastShow(true);
-  //       navigate("/");
-  //     } else {
-  //       setPatientList(data.patientlist);
-  //     }
-  //   }
-  //   fetchPatientList();
-  // }, [patientList]);
-
   return (
     <div className="m-4 mt-4 font-poppins col-span-10">
       <div>

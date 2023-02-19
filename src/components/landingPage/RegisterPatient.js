@@ -5,6 +5,12 @@ import plus_logo from "../../assets/img/dashboard/add2_pbl.png";
 import minus_logo from "../../assets/img/dashboard/minus2_pbl.png";
 import { useNavigate } from "react-router-dom";
 import ReactLoading from "react-loading";
+// import auth from "../firebase.ts";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
+import { uid } from "uid";
+
+import { getDatabase, ref, set } from "firebase/database";
 
 export default function Register(props) {
   const navigate = useNavigate();
@@ -16,108 +22,52 @@ export default function Register(props) {
     address: {},
     contactPerson: { address: {} },
   });
-  const [diseaseList, setDiseaseList] = useState([{ disease: "", yrs: "" }]);
   const [passwordError, setPasswordError] = useState("");
-  const addDisease = () => {
-    const diseaseList1 = [...diseaseList];
-    diseaseList1.push({ disease: "", yrs: "" });
-    setDiseaseList(diseaseList1);
-  };
+  const [fname, set_fname] = useState("");
+  const [lname, set_lname] = useState("");
+  const [dob, set_dob] = useState("");
+  const [mobile, set_mobile] = useState("");
+  const [email, set_email] = useState("");
+  const [cnic, set_cnic] = useState("");
+  const [blood, setblood] = useState("");
+  const [area, set_area] = useState("");
+  const [city, set_city] = useState("");
+  const [district, set_district] = useState("");
+  const [state, set_state] = useState("");
+  const [pass, set_pass] = useState("");
+  const [cpass, set_cpass] = useState("");
 
-  const [patient, setPatient] = useState({
-    name: {
-      firstName: "",
-      middleName: "",
-      surName: "",
-    },
-    dob: "",
-    mobile: "",
-    email: "",
-    Cnic: "",
-    bloodGroup: "",
-    address: {
-      building: "",
-      city: "",
-      taluka: "",
-      district: "",
-      state: "",
-      pincode: "",
-    },
-    password: "",
-    diseases: diseaseList,
-    contactPerson: {
-      name: {
-        firstName: "",
-        surName: "",
-      },
-      mobile: "",
-      email: "",
-      relation: "",
-      address: {
-        building: "",
-        city: "",
-        taluka: "",
-        district: "",
-        state: "",
-        pincode: "",
-      },
-    },
-  });
-
-  useEffect(() => {
-    const auth = async () => {
-      const res = await fetch("/auth");
-      const data = await res.json();
-      if (data.msg === "Doctor Login Found") {
-        navigate("/doctor/dashboard");
-      }
-      if (data.msg === "Admin Login Found") {
-        navigate("/admin/dashboard");
-      }
-      if (data.msg === "Patient Login Found") {
-        navigate("/patient/dashboard");
-      }
-    };
-    auth();
-  });
-
-  const handleRegisterPatient = async (e) => {
-    e.preventDefault();
-    setPasswordError("");
-    if (patient.password === confirmPassword) {
-      setLoading(true);
-      e.preventDefault();
-      const res = await fetch("/register/patient", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(patient),
+  function register(userId) {
+    const db = getDatabase();
+    const auth = getAuth();
+    userId = uid();
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then(() => {
+        set(ref(db, "patients/" + userId), {
+          firstname: fname,
+          lastname: lname,
+          emails: email,
+          dob: dob,
+          mobile: mobile,
+          cnic: cnic,
+          BloodGroup: blood,
+          area: area,
+          city: city,
+          district: district,
+          state: state,
+          password: pass,
+          type: "patient",
+        });
+      })
+      .catch((e) => {
+        console.log(e);
       });
+  }
 
-      const data = await res.json();
-
-      if (data.errors) {
-        setLoading(false);
-        setErrors(data.errors);
-        props.settoastCondition({
-          status: "error",
-          message: "Please Enter all fields correctly!",
-        });
-        props.setToastShow(true);
-      } else {
-        setLoading(false);
-        props.settoastCondition({
-          status: "success",
-          message: "Your Registration done Successfully!",
-        });
-        props.setToastShow(true);
-        navigate("/patient/dashboard");
-      }
-    } else {
-      setPasswordError("Password Doesn't Matches");
-    }
-  };
+  // const register = async (e) => {
+  //   const db = getDatabase();
+  //
+  // };
   return (
     <div className="body overflow-hidden">
       <Navbar></Navbar>
@@ -129,7 +79,7 @@ export default function Register(props) {
 
           <form
             className="font-poppins lg:ml-60  lg:px-8 lg:py-4 bg-white shadow-lg rounded max-w-screen-lg mt-8 mb-4 "
-            onSubmit={handleRegisterPatient}
+            onSubmit={register}
           >
             <div className="flex   mt-2 bg-bgsecondary w-fit  justify-between rounded mx-auto">
               <button
@@ -184,34 +134,23 @@ export default function Register(props) {
                     className="bg-blue-100 rounded lg:h-10 lg:pl-4 mt-4 lg:text-md text-sm h-8 px-2"
                     required
                     placeholder="first name"
-                    value={patient.name.firstName}
+                    value={fname}
+                    type="text"
                     onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.name.firstName = e.target.value;
-                      setPatient(temppatient);
+                      set_fname(e.target.value);
+                      // register();
                     }}
                   ></input>
                 </div>
-                <input
-                  className="bg-blue-100 rounded lg:h-10 lg:pl-4 mt-4 lg:text-md text-sm h-8 px-2"
-                  required
-                  placeholder="middle name"
-                  value={patient.name.middleName}
-                  onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.name.middleName = e.target.value;
-                    setPatient(temppatient);
-                  }}
-                ></input>
+
                 <input
                   className="bg-blue-100 rounded lg:h-10 lg:pl-4 mt-4 lg:text-md text-sm h-8 px-2"
                   required
                   placeholder="last name"
-                  value={patient.name.surName}
+                  type="text"
+                  value={lname}
                   onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.name.surName = e.target.value;
-                    setPatient(temppatient);
+                    set_lname(e.target.value);
                   }}
                 ></input>
               </div>
@@ -221,11 +160,9 @@ export default function Register(props) {
                   type="date"
                   className=" bg-blue-100 lg:h-10 rounded pl-4 h-8"
                   required
-                  value={patient.dob}
+                  value={dob}
                   onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.dob = e.target.value;
-                    setPatient(temppatient);
+                    set_dob(e.target.value);
                   }}
                 ></input>
               </div>
@@ -239,11 +176,9 @@ export default function Register(props) {
                   placeholder="mobile no."
                   required
                   className="pl-4 bg-blue-100 lg:h-10  rounded h-8"
-                  value={patient.mobile}
+                  value={mobile}
                   onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.mobile = e.target.value;
-                    setPatient(temppatient);
+                    set_mobile(e.target.value);
                   }}
                 ></input>
               </div>
@@ -256,11 +191,9 @@ export default function Register(props) {
                     placeholder="CNIC"
                     required
                     className="pl-4 bg-blue-100 lg:h-10  rounded h-8"
-                    value={patient.Cnic}
+                    value={cnic}
                     onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.Cnic = e.target.value;
-                      setPatient(temppatient);
+                      set_cnic(e.target.value);
                     }}
                   ></input>
                   <span className="text-xs text-red-500 py-1">
@@ -277,11 +210,10 @@ export default function Register(props) {
                   placeholder="e.g : abcdefg@gmail.com"
                   required
                   className="bg-blue-100 lg:h-10 rounded pl-4 col-span-2 h-8"
-                  value={patient.email}
+                  value={email}
                   onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.email = e.target.value;
-                    setPatient(temppatient);
+                    set_email(e.target.value);
+                    // register();
                   }}
                 ></input>
               </div>
@@ -294,11 +226,9 @@ export default function Register(props) {
                   <select
                     className="pl-4 lg:w-1/2 bg-blue-100 lg:h-10  rounded  h-8"
                     id="blood-group"
-                    value={patient.bloodGroup}
+                    value={blood}
                     onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.bloodGroup = e.target.value;
-                      setPatient(temppatient);
+                      setblood(e.target.value);
                     }}
                   >
                     <option id="select">select</option>
@@ -324,11 +254,9 @@ export default function Register(props) {
                     className="bg-blue-100 lg:h-10  rounded pl-4 h-8 "
                     required
                     placeholder="building/area"
-                    value={patient.address.building}
+                    value={area}
                     onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.address.building = e.target.value;
-                      setPatient(temppatient);
+                      set_area(e.target.value);
                     }}
                   ></input>
                   <input
@@ -336,11 +264,10 @@ export default function Register(props) {
                     className="bg-blue-100 lg:h-10  rounded pl-4 h-8 "
                     required
                     placeholder="village/city"
-                    value={patient.address.city}
+                    value={city}
                     onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.address.city = e.target.value;
-                      setPatient(temppatient);
+                      set_city(e.target.value);
+                      register();
                     }}
                   ></input>
 
@@ -349,11 +276,9 @@ export default function Register(props) {
                     className="bg-blue-100 lg:h-10  rounded  pl-4 h-8"
                     required
                     placeholder="District"
-                    value={patient.address.district}
+                    value={district}
                     onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.address.district = e.target.value;
-                      setPatient(temppatient);
+                      set_district(e.target.value);
                     }}
                   ></input>
                   <input
@@ -361,22 +286,16 @@ export default function Register(props) {
                     className="bg-blue-100 lg:h-10  rounded  pl-4 h-8"
                     required
                     placeholder="Pin-code"
-                    value={patient.address.pincode}
-                    onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.address.pincode = e.target.value;
-                      setPatient(temppatient);
-                    }}
+                    // value={}
+                    onChange={(e) => {}}
                   ></input>
                   <input
                     type="text"
                     className="bg-blue-100 lg:h-10  rounded  pl-4 h-8"
                     placeholder="State"
-                    value={patient.address.state}
+                    value={state}
                     onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.address.state = e.target.value;
-                      setPatient(temppatient);
+                      set_state(e.target.value);
                     }}
                   ></input>
                 </div>
@@ -392,11 +311,9 @@ export default function Register(props) {
                   className="bg-blue-100 lg:h-10  rounded pl-4 h-8"
                   required
                   placeholder="password"
-                  value={patient.password}
+                  value={pass}
                   onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.password = e.target.value;
-                    setPatient(temppatient);
+                    set_pass(e.target.value);
                   }}
                 ></input>
               </div>
@@ -411,234 +328,16 @@ export default function Register(props) {
                   className="bg-blue-100 lg:h-10  rounded lg:pl-4 h-8 pl-2"
                   required
                   placeholder="Confirm password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={cpass}
+                  onChange={(e) => set_cpass(e.target.value)}
                 ></input>
                 <span className="text-sm py-1 text-red-500">
                   {passwordError}
                 </span>
               </div>
-
-              <div className="lg:grid lg:grid-cols-10 gap-2 mt-8 mr-4">
-                <div className="col-span-5">
-                  <label className=" lg:text-xl font-bold px-4 grid col-start-1 col-span-3">
-                    Name of any permanant disease (if any)
-                  </label>
-                </div>
-                <div className="col-span-4">
-                  {diseaseList.map((disease, index) => {
-                    return (
-                      <div
-                        key={index}
-                        className="grid grid-cols-7 col-span-1 mb-3"
-                      >
-                        <input
-                          className="bg-blue-100 lg:h-10 col-span-3 rounded lg:pl-4 h-8 pl-2"
-                          type="text"
-                          name="disease"
-                          value={disease.disease}
-                          placeholder="eg.dibetes"
-                          onChange={(e) => {
-                            let diseaseList1 = [...diseaseList];
-                            diseaseList1[index].disease = e.target.value;
-                            setDiseaseList(diseaseList1);
-                            let temppatient = { ...patient };
-                            temppatient.diseases = diseaseList;
-                            setPatient(temppatient);
-                          }}
-                        />
-                        <input
-                          className="bg-blue-100 lg:h-10 col-span-3  rounded lg:pl-4 h-8 pl-2 ml-4"
-                          type="text"
-                          name="yrs"
-                          placeholder="years e.g 3"
-                          value={disease.yrs}
-                          onChange={(e) => {
-                            let diseaseList1 = [...diseaseList];
-                            diseaseList1[index].yrs = e.target.value;
-                            setDiseaseList(diseaseList1);
-                            let temppatient = { ...patient };
-                            temppatient.diseases = diseaseList;
-                            setPatient(temppatient);
-                          }}
-                        />
-
-                        <div
-                          className="col-span-1 pl-3"
-                          onClick={() => {
-                            if (diseaseList.length > 1) {
-                              let diseaseList1 = [...diseaseList];
-                              diseaseList1.splice(index, 1);
-                              let temppatient = { ...patient };
-                              temppatient.diseases = diseaseList1;
-                              setPatient(temppatient);
-                              setDiseaseList(diseaseList1);
-                            }
-                          }}
-                        >
-                          <img src={minus_logo} alt="" className="h-8 w-8" />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div onClick={addDisease} className="col-span-1">
-                  <img src={plus_logo} alt="" className="h-8 w-8" />
-                </div>
-              </div>
             </div>
 
             <div className={Toggle === "Patient" ? "" : "hidden"}>
-              <div className="flex justify-center">
-                <h1 className=" p-4 rounded font-bold lg:text-3xl text-xl mt-2">
-                  Emergency Contact Details
-                </h1>
-              </div>
-
-              <div className="lg:grid grid-cols-4 gap-2 mt-8 mr-4 flex">
-                <label className="font-bold lg:text-xl px-4 ">Name</label>
-                <input
-                  className="bg-blue-100 rounded h-10 pl-4"
-                  placeholder="first name"
-                  value={patient.contactPerson.name.firstName}
-                  onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.contactPerson.name.firstName = e.target.value;
-                    setPatient(temppatient);
-                  }}
-                ></input>
-                <input
-                  className="bg-blue-100 rounded h-10 pl-4"
-                  placeholder="last name"
-                  value={patient.contactPerson.name.surName}
-                  onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.contactPerson.name.surName = e.target.value;
-                    setPatient(temppatient);
-                  }}
-                ></input>
-              </div>
-              <div className="lg:grid grid-cols-4 gap-2 mt-4 mr-4">
-                <label className="font-bold lg:text-xl px-4 ">
-                  Mobile No.{" "}
-                </label>
-
-                <input
-                  type="tel"
-                  placeholder="mobile no."
-                  required
-                  className="pl-4 bg-blue-100 lg:h-10  rounded h-8"
-                  value={patient.contactPerson.mobile}
-                  onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.contactPerson.mobile = e.target.value;
-                    setPatient(temppatient);
-                  }}
-                ></input>
-              </div>
-
-              <div className="lg:grid grid-cols-4 gap-2 mt-4 mr-4">
-                <label className="  lg:text-xl font-bold px-4">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  className="bg-blue-100 lg:h-10 rounded pl-4 h-8"
-                  value={patient.contactPerson.email}
-                  onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.contactPerson.email = e.target.value;
-                    setPatient(temppatient);
-                  }}
-                ></input>
-              </div>
-
-              <div className="mt-4">
-                <label className=" rounded p-2 lg:text-xl font-bold px-4">
-                  Relation with patient
-                </label>
-                <input
-                  className="bg-blue-100 lg:h-10 ml-24 rounded pl-4 h-8 lg:mt-0 lg:ml-0 mt-2 "
-                  placeholder="eg. father"
-                  value={patient.contactPerson.relation}
-                  onChange={(e) => {
-                    let temppatient = { ...patient };
-                    temppatient.contactPerson.relation = e.target.value;
-                    setPatient(temppatient);
-                  }}
-                ></input>
-              </div>
-
-              <div className="grid grid-cols-4 gap-2 mt-4 mr-4 grid-flow-dense ">
-                <label className=" lg:text-xl font-bold px-4 mb-8 col-span-1">
-                  Address
-                </label>
-                <div className="grid grid-cols-2 gap-8 col-span-3 ">
-                  <input
-                    type="text"
-                    className="bg-blue-100 h-10  rounded pl-4 "
-                    required
-                    placeholder="building/area"
-                    value={patient.contactPerson.address.building}
-                    onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.contactPerson.address.building =
-                        e.target.value;
-                      setPatient(temppatient);
-                    }}
-                  ></input>
-                  <input
-                    type="text"
-                    className="bg-blue-100 h-10  rounded pl-4 "
-                    required
-                    placeholder="village/city"
-                    value={patient.contactPerson.address.city}
-                    onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.contactPerson.address.city = e.target.value;
-                      setPatient(temppatient);
-                    }}
-                  ></input>
-
-                  <input
-                    type="text"
-                    className="bg-blue-100 h-10  rounded  pl-4"
-                    required
-                    placeholder="District"
-                    value={patient.contactPerson.address.district}
-                    onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.contactPerson.address.district =
-                        e.target.value;
-                      setPatient(temppatient);
-                    }}
-                  ></input>
-                  <input
-                    type="number"
-                    className="bg-blue-100 h-10  rounded  pl-4"
-                    required
-                    placeholder="Pin-code"
-                    value={patient.contactPerson.address.pincode}
-                    onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.contactPerson.address.pincode =
-                        e.target.value;
-                      setPatient(temppatient);
-                    }}
-                  ></input>
-                  <input
-                    type="text"
-                    className="bg-blue-100 h-10  rounded  pl-4"
-                    placeholder="State"
-                    value={patient.contactPerson.address.state}
-                    onChange={(e) => {
-                      let temppatient = { ...patient };
-                      temppatient.contactPerson.address.state = e.target.value;
-                      setPatient(temppatient);
-                    }}
-                  ></input>
-                </div>
-              </div>
               <div className="flex justify-center mb-4 mt-8">
                 {Loading ? (
                   <ReactLoading
