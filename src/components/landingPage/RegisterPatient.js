@@ -163,6 +163,7 @@ export default function Register(props) {
                   value={dob}
                   onChange={(e) => {
                     set_dob(e.target.value);
+                    register();
                   }}
                 ></input>
               </div>
