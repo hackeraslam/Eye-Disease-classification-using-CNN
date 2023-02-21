@@ -4,6 +4,11 @@ import plus_logo from "../../assets/img/dashboard/add2_pbl.png";
 import minus_logo from "../../assets/img/dashboard/minus2_pbl.png";
 import { useNavigate } from "react-router-dom";
 import ReactLoading from "react-loading";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
+import { uid } from "uid";
+
+import { getDatabase, ref, set } from "firebase/database";
 
 export default function Register(props) {
   const navigate = useNavigate();
@@ -46,7 +51,45 @@ export default function Register(props) {
     },
     specialization: SpecialityList,
     password: "",
+    type: "doctor",
   });
+
+  async function register(event) {
+    event.preventDefault();
+    const db = getDatabase();
+    const auth = getAuth();
+    const userId = uid();
+    createUserWithEmailAndPassword(auth, doctor.email, doctor.password)
+      .then(() => {
+        try {
+          set(ref(db, "doctors/" + userId), {
+            firstName: doctor.name.firstName,
+            lastname: doctor.name.surName,
+            cnic: doctor.Cnic,
+            BloodGroup: doctor.bloodGroup,
+            dob: doctor.dob,
+            emails: doctor.email,
+            mobile: doctor.mobile,
+            emergencyno: doctor.emergencyno,
+            org: doctor.org,
+            orgAddress: doctor.orgAddress,
+            pass: doctor.password,
+            specialization: doctor.specialization,
+            address: doctor.address,
+            type: "doctor",
+          });
+        } catch (e) {
+          console.log("INternal : ", e);
+        }
+      })
+      .catch((e) => {
+        props.settoastCondition({
+          status: "error",
+          message: e,
+        });
+        props.setToastShow(true);
+      });
+  }
 
   // const handleRegisterDoctor = async (e) => {
   //   e.preventDefault();
@@ -123,17 +166,7 @@ export default function Register(props) {
                   setDoctor(tempdoctor);
                 }}
               ></input>
-              <input
-                class="bg-blue-100 rounded h-10 pl-4 mt-4"
-                required
-                placeholder="middle name"
-                value={doctor.name.middleName}
-                onChange={(e) => {
-                  let tempdoctor = { ...doctor };
-                  tempdoctor.name.middleName = e.target.value;
-                  setDoctor(tempdoctor);
-                }}
-              ></input>
+
               <input
                 class="bg-blue-100 rounded h-10 pl-4 mt-4 "
                 required
@@ -597,7 +630,8 @@ export default function Register(props) {
                 required
                 placeholder="Confirm password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                // onChange={(e) => setConfirmPassword(e.target.value) }
+                onChange={register}
               ></input>
               <span className="text-sm py-1 text-red-500">{passwordError}</span>
             </div>
@@ -611,7 +645,10 @@ export default function Register(props) {
                   width={"5%"}
                 />
               ) : (
-                <button className="bg-primary rounded p-2 px-8 font-bold text-xl hover:bg-bgsecondary mb-4 ">
+                <button
+                  className="bg-primary rounded p-2 px-8 font-bold text-xl hover:bg-bgsecondary mb-4 "
+                  onClick={register}
+                >
                   Submit
                 </button>
               )}

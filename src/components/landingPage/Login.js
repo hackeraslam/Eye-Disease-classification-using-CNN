@@ -3,6 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import profile from "../../assets/img/landingPage/profile.png";
 import ReactLoading from "react-loading";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getDatabase,
+  ref,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
 import { auth } from "../firebase.ts";
 // import { Auth } from "firebase/auth";
 export default function Login(props) {
@@ -15,103 +23,26 @@ export default function Login(props) {
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [user, setUser] = useState({});
+  const [usertype, settype] = useState("");
 
   // useMountEffect(() => {
   //   window.location.reload(false);
   // });
-  // useEffect(() => {
-  //   const auths = async () => {
-  //     const res = await fetch("/auth");
-  //     const data = await res.json();
-  //     if (data.msg === "Doctor Login Found") {
-  //       navigate("/doctor/dashboard");
-  //     }
-  //     if (data.msg === "Admin Login Found") {
-  //       navigate("/admin/dashboard");
-  //     }
-  //     if (data.msg === "Patient Login Found") {
-  //       navigate("/patient/dashboard");
-  //     }
-  //   };
-  //   auths();
-  // });
-
-  const handlePatientLogin = async (healthID, password) => {
-    setLoading(true);
-
-    // const res = await fetch("/login/patient", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     healthID,
-    //     password,
-    //   }),
-    // });
-
-    // const data = await res.json();
-
-    // if (data.errors) {
-    //   setUsernameError(data.errors.healthID);
-    //   setPasswordError(data.errors.password);
-    //   setLoading(false);
-    // } else {
-    //   setLoading(false);
-    //   props.settoastCondition({
-    //     status: "success",
-    //     message: "Logged in Successfully!!!",
-    //   });
-    // props.setToastShow(true);
-    // navigate("/patient/dashboard");
-    // }
-  };
-
-  const handleDoctorAdminLogin = async (email, password, path) => {
-    // setLoading(true);
-    // const res = await fetch(path, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     email,
-    //     password,
-    //   }),
-    // });
-
-    // const data = await res.json();
-    // if (data.err) {
-    //   setLoading(false);
-    //   props.settoastCondition({
-    //     status: "error",
-    //     message: "Wrong Credentials!!!",
-    //   });
-    //   props.setToastShow(true);
-    // } else if (data.errors) {
-    //   setUsernameError(data.errors.healthID);
-    //   setPasswordError(data.errors.password);
-    //   setLoading(false);
-    //   props.settoastCondition({
-    //     status: "error",
-    //     message: "Wrong Credentials!!!",
-    //   });
-    //   props.setToastShow(true);
-    // } else {
-    //   setLoading(false);
-    //   props.settoastCondition({
-    //     status: "success",
-    //     message: "Logged in Successfully!!!",
-    //   });
-    props.setToastShow(true);
-    if (path == "/login/doctor") {
-      navigate("/doctor/dashboard");
-    } else {
-      navigate("/admin/dashboard");
-    }
-    // }
-  };
-
+  useEffect(() => {
+    const auths = async () => {
+      if (usertype === "doctor") {
+        navigate("/doctor/dashboard");
+      }
+      if (usertype === "admin") {
+        navigate("/admin/dashboard");
+      }
+      if (usertype === "patient") {
+        navigate("/patient/dashboard");
+      }
+    };
+    auths();
+  });
   const handleLogin = async (e) => {
     e.preventDefault();
     switch (Toggle) {
@@ -119,17 +50,30 @@ export default function Login(props) {
         await signInWithEmailAndPassword(auth, username, password)
           .then(() => {
             setLoading(false);
-            navigate("/patient/dashboard");
-            props.settoastCondition({
-              status: "success",
-              message: "Logged in Successfully!!!",
+
+            const auth = getAuth();
+            const currentUser = auth.currentUser;
+            console.log(currentUser.email);
+
+            const userEmail = currentUser.email;
+            const dbRef = ref(getDatabase(), "patients");
+            const emailQuery = query(
+              dbRef,
+              orderByChild("emails"),
+              equalTo(userEmail)
+            );
+
+            onValue(emailQuery, (snapshot) => {
+              const data = Object.values(snapshot.val())[0];
+
+              setUser(data);
+              settype(data.type);
+              if (data.type == "patient") {
+                navigate("/patient/dashboard");
+              }
             });
-            props.setToastShow(true);
           })
           .catch((error) => {
-            // navigate("/");
-            // setUsernameError(error);
-            // setPasswordError(error);
             setLoading(false);
           });
 
@@ -147,8 +91,8 @@ export default function Login(props) {
           })
           .catch((error) => {
             // navigate("/");
-            // setUsernameError(error);
-            // setPasswordError(error);
+            setUsernameError(error);
+            setPasswordError(error);
             setLoading(false);
           });
         break;

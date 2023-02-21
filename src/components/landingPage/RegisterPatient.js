@@ -37,30 +37,39 @@ export default function Register(props) {
   const [pass, set_pass] = useState("");
   const [cpass, set_cpass] = useState("");
 
-  function register(userId) {
+  async function register(event) {
+    event.preventDefault();
     const db = getDatabase();
     const auth = getAuth();
-    userId = uid();
+    const userId = uid();
     createUserWithEmailAndPassword(auth, email, pass)
       .then(() => {
-        set(ref(db, "patients/" + userId), {
-          firstname: fname,
-          lastname: lname,
-          emails: email,
-          dob: dob,
-          mobile: mobile,
-          cnic: cnic,
-          BloodGroup: blood,
-          area: area,
-          city: city,
-          district: district,
-          state: state,
-          password: pass,
-          type: "patient",
-        });
+        try {
+          set(ref(db, "patients/" + userId), {
+            firstname: fname,
+            lastname: lname,
+            emails: email,
+            dob: dob,
+            mobile: mobile,
+            cnic: cnic,
+            BloodGroup: blood,
+            area: area,
+            city: city,
+            district: district,
+            state: state,
+            password: pass,
+            type: "patient",
+          });
+        } catch (e) {
+          console.log("INternal : ", e);
+        }
       })
       .catch((e) => {
-        console.log(e);
+        props.settoastCondition({
+          status: "error",
+          message: e,
+        });
+        props.setToastShow(true);
       });
   }
 
@@ -163,7 +172,7 @@ export default function Register(props) {
                   value={dob}
                   onChange={(e) => {
                     set_dob(e.target.value);
-                    register();
+                    // register();
                   }}
                 ></input>
               </div>
@@ -268,7 +277,7 @@ export default function Register(props) {
                     value={city}
                     onChange={(e) => {
                       set_city(e.target.value);
-                      register();
+                      // register();
                     }}
                   ></input>
 
