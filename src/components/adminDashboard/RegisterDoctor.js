@@ -630,8 +630,8 @@ export default function Register(props) {
                 required
                 placeholder="Confirm password"
                 value={confirmPassword}
-                // onChange={(e) => setConfirmPassword(e.target.value) }
-                onChange={register}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                // onChange={register}
               ></input>
               <span className="text-sm py-1 text-red-500">{passwordError}</span>
             </div>
