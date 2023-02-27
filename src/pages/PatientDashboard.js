@@ -14,8 +14,10 @@ const PatientDashboard = (props) => {
     console.log(e.target.files);
     setFile(URL.createObjectURL(e.target.files[0]));
   }
+  const date = new Date();
   const [dob, setDob] = useState("01/01/2006");
   const [file, setFile] = useState();
+  const [imag, set_imag] = useState();
   const [disease, setDisease] = useState();
   const [patient, setPatient] = useState({
     name: {
@@ -57,10 +59,7 @@ const PatientDashboard = (props) => {
     },
   });
   const [prescriptions, setPrescriptions] = useState([{}]);
-  function handleChange(e) {
-    console.log(e.target.files);
-    setFile(URL.createObjectURL(e.target.files[0]));
-  }
+
   async function sendImageToAPI() {
     const formData = new FormData();
     formData.append("image", file);
@@ -199,7 +198,7 @@ const PatientDashboard = (props) => {
                       <h1>Date :</h1>
                     </div>
                     <div className="ml-2">
-                      <h1>{convertDatetoString(prescriptions[0].createdAt)}</h1>
+                      <h1>{convertDatetoString(date)}</h1>
                     </div>
                   </div>
                   <div className="flex">
@@ -216,10 +215,15 @@ const PatientDashboard = (props) => {
                     onChange={(e) => {
                       console.log(e.target.files[0]);
                       setFile(e.target.files[0]);
+                      set_imag(URL.createObjectURL(e.target.files[0]));
                     }}
                   />
-                  <img src={file} alt="" />
-                  <button onClick={sendImageToAPI}>Check</button>
+                  <img width={300} height={300} src={imag} alt="" />
+                  <div className=" mx-50   mt-5 py-1  bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-20  ">
+                    <button className="font-bold" onClick={sendImageToAPI}>
+                      Check
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="bg-white mt-4 font-poppins p-4 rounded-xl shadow px-8 flex justify-center font-bold">
