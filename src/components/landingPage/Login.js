@@ -29,20 +29,20 @@ export default function Login(props) {
   // useMountEffect(() => {
   //   window.location.reload(false);
   // });
-  useEffect(() => {
-    const auths = async () => {
-      if (usertype === "doctor") {
-        navigate("/doctor/dashboard");
-      }
-      if (usertype === "admin") {
-        navigate("/admin/dashboard");
-      }
-      if (usertype === "patient") {
-        navigate("/patient/dashboard");
-      }
-    };
-    auths();
-  });
+  // useEffect(() => {
+  //   const auths = async () => {
+  //     if (usertype === "doctor") {
+  //       navigate("/doctor/dashboard");
+  //     }
+  //     if (usertype === "admin") {
+  //       navigate("/admin/dashboard");
+  //     }
+  //     if (usertype === "patient") {
+  //       navigate("/patient/dashboard");
+  //     }
+  //   };
+  //   auths();
+  // });
   const handleLogin = async (e) => {
     e.preventDefault();
     switch (Toggle) {
@@ -68,7 +68,7 @@ export default function Login(props) {
 
               setUser(data);
               settype(data.type);
-              if (data.type == "patient") {
+              if (data.type === "patient") {
                 navigate("/patient/dashboard");
               }
             });
@@ -82,12 +82,28 @@ export default function Login(props) {
         await signInWithEmailAndPassword(auth, username, password)
           .then(() => {
             setLoading(false);
-            navigate("/doctor/dashboard");
-            props.settoastCondition({
-              status: "success",
-              message: "Logged in Successfully!!!",
+
+            const auth = getAuth();
+            const currentUser = auth.currentUser;
+            console.log(currentUser.email);
+
+            const userEmail = currentUser.email;
+            const dbRef = ref(getDatabase(), "doctors");
+            const emailQuery = query(
+              dbRef,
+              orderByChild("emails"),
+              equalTo(userEmail)
+            );
+
+            onValue(emailQuery, (snapshot) => {
+              const data = Object.values(snapshot.val())[0];
+
+              setUser(data);
+              settype(data.type);
+              if (data.type == "doctor") {
+                navigate("/doctor/dashboard");
+              }
             });
-            props.setToastShow(true);
           })
           .catch((error) => {
             // navigate("/");

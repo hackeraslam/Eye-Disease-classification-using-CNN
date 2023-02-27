@@ -10,8 +10,13 @@ import { useEffect, useState } from "react";
 
 const PatientDashboard = (props) => {
   const navigate = useNavigate();
-
+  function uploadImage(e) {
+    console.log(e.target.files);
+    setFile(URL.createObjectURL(e.target.files[0]));
+  }
   const [dob, setDob] = useState("01/01/2006");
+  const [file, setFile] = useState();
+  const [disease, setDisease] = useState();
   const [patient, setPatient] = useState({
     name: {
       firstName: "",
@@ -52,6 +57,28 @@ const PatientDashboard = (props) => {
     },
   });
   const [prescriptions, setPrescriptions] = useState([{}]);
+  function handleChange(e) {
+    console.log(e.target.files);
+    setFile(URL.createObjectURL(e.target.files[0]));
+  }
+  async function sendImageToAPI() {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await fetch("http://127.0.0.1:5000/predict", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log(result.result);
+    if (result.result === 0) {
+      setDisease("Cataract");
+    } else {
+      setDisease("Normal");
+    }
+    return result.result;
+  }
 
   const convertDatetoString = (dateString) => {
     let date = new Date(dateString);
@@ -180,23 +207,19 @@ const PatientDashboard = (props) => {
                       <h1>Diagnosis : </h1>
                     </div>
                     <div className="ml-2">
-                      <h1>{prescriptions[0].diagnosis}</h1>
+                      <h1>{disease}</h1>
                     </div>
                   </div>
-                  <Link
-                    to="/patient/prescription"
-                    onClick={() => {
-                      props.setPrescriptionID(prescriptions[0]._id);
-                    }}
-                  >
-                    <div className=" mt-2 flex items-center justify-evenly text-base bg-primary py-1 px-2 rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-5/12  ">
-                      <img src={reports} className="h-4" alt="report"></img>
 
-                      <button className=" font-semibold pl-1">
-                        Generate Report
-                      </button>
-                    </div>
-                  </Link>
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      console.log(e.target.files[0]);
+                      setFile(e.target.files[0]);
+                    }}
+                  />
+                  <img src={file} alt="" />
+                  <button onClick={sendImageToAPI}>Check</button>
                 </div>
               ) : (
                 <div className="bg-white mt-4 font-poppins p-4 rounded-xl shadow px-8 flex justify-center font-bold">
@@ -227,9 +250,9 @@ const PatientDashboard = (props) => {
                   <div>
                     <h1>Diagnosis</h1>
                   </div>
-                  <div>
+                  {/* <div>
                     <h1>Prescription</h1>
-                  </div>
+                  </div> */}
                   <hr></hr>
                   <hr></hr>
                   <hr></hr>
