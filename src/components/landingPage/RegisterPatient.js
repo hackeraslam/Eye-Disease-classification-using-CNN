@@ -60,16 +60,14 @@ export default function Register(props) {
             password: pass,
             type: "patient",
           });
+          alert("Account Created Sucessfully..");
         } catch (e) {
           console.log("INternal : ", e);
+          alert(e.message);
         }
       })
       .catch((e) => {
-        props.settoastCondition({
-          status: "error",
-          message: e,
-        });
-        props.setToastShow(true);
+        alert(e.message);
       });
   }
 

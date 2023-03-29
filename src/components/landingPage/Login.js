@@ -26,30 +26,14 @@ export default function Login(props) {
   const [user, setUser] = useState({});
   const [usertype, settype] = useState("");
 
-  // useMountEffect(() => {
-  //   window.location.reload(false);
-  // });
-  // useEffect(() => {
-  //   const auths = async () => {
-  //     if (usertype === "doctor") {
-  //       navigate("/doctor/dashboard");
-  //     }
-  //     if (usertype === "admin") {
-  //       navigate("/admin/dashboard");
-  //     }
-  //     if (usertype === "patient") {
-  //       navigate("/patient/dashboard");
-  //     }
-  //   };
-  //   auths();
-  // });
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     switch (Toggle) {
       case "Patient":
         await signInWithEmailAndPassword(auth, username, password)
           .then(() => {
-            setLoading(false);
+            setLoading(true);
 
             const auth = getAuth();
             const currentUser = auth.currentUser;
@@ -70,18 +54,24 @@ export default function Login(props) {
               settype(data.type);
               if (data.type === "patient") {
                 navigate("/patient/dashboard");
+              } else {
+                setLoading(false);
+                alert("Invalid Email or Password");
               }
             });
           })
           .catch((error) => {
             setLoading(false);
+            alert(error.message);
+            // setUsernameError(error);
+            // setPasswordError(error);
           });
 
         break;
       case "Doctor":
         await signInWithEmailAndPassword(auth, username, password)
           .then(() => {
-            setLoading(false);
+            setLoading(true);
 
             const auth = getAuth();
             const currentUser = auth.currentUser;
@@ -100,16 +90,20 @@ export default function Login(props) {
 
               setUser(data);
               settype(data.type);
-              if (data.type == "doctor") {
+              if (data.type === "doctor") {
                 navigate("/doctor/dashboard");
+              } else {
+                setLoading(false);
+                alert("Error while Login");
               }
             });
           })
           .catch((error) => {
             // navigate("/");
-            setUsernameError(error);
-            setPasswordError(error);
+            // setUsernameError(error);
+            // setPasswordError(error);
             setLoading(false);
+            alert("Error while Login");
           });
         break;
       case "Admin":
@@ -128,6 +122,7 @@ export default function Login(props) {
             // setUsernameError(error);
             // setPasswordError(error);
             setLoading(false);
+            alert(error.message);
           });
         break;
       default:

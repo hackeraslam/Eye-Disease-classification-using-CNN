@@ -7,6 +7,15 @@ import Footer from "../components/landingPage/Footer";
 import eye from "../assets/img/dashboard/eye.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from "@material-ui/core";
+
+// import { Button } from "bootstrap";
 
 const PatientDashboard = (props) => {
   const navigate = useNavigate();
@@ -19,6 +28,8 @@ const PatientDashboard = (props) => {
   const [file, setFile] = useState();
   const [imag, set_imag] = useState();
   const [disease, setDisease] = useState();
+  const [open, setopen] = useState();
+  const handleOpen = () => setopen(!open);
   const [patient, setPatient] = useState({
     name: {
       firstName: "",
@@ -63,7 +74,7 @@ const PatientDashboard = (props) => {
   async function sendImageToAPI() {
     const formData = new FormData();
     formData.append("image", file);
-
+    handleOpen();
     const response = await fetch("http://127.0.0.1:5000/predict", {
       method: "POST",
       body: formData,
@@ -72,9 +83,9 @@ const PatientDashboard = (props) => {
     const result = await response.json();
     console.log(result.result);
     if (result.result === 0) {
-      setDisease("Cataract");
+      setDisease("Your Eye is Effected with Cataract Disease");
     } else {
-      setDisease("Normal");
+      setDisease("Congrats, Your Eye is Normal");
     }
     return result.result;
   }
@@ -201,29 +212,40 @@ const PatientDashboard = (props) => {
                       <h1>{convertDatetoString(date)}</h1>
                     </div>
                   </div>
-                  <div className="flex">
-                    <div>
-                      <h1>Diagnosis : </h1>
-                    </div>
-                    <div className="ml-2">
-                      <h1>{disease}</h1>
-                    </div>
-                  </div>
 
                   <input
                     type="file"
                     onChange={(e) => {
                       console.log(e.target.files[0]);
                       setFile(e.target.files[0]);
+                      setDisease("Loading");
                       set_imag(URL.createObjectURL(e.target.files[0]));
                     }}
                   />
-                  <img width={300} height={300} src={imag} alt="" />
-                  <div className=" mx-50   mt-5 py-1  bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-20  ">
-                    <button className="font-bold" onClick={sendImageToAPI}>
-                      Check
-                    </button>
+                  <img width={200} height={200} src={imag} alt="" />
+                  <div className=" mx-50   mt-5 pl-5  bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-40  ">
+                    <Button
+                      className="font-bold"
+                      size="lg"
+                      onClick={sendImageToAPI}
+                    >
+                      Check Disease
+                    </Button>
                   </div>
+                  <Dialog open={open} handler={handleOpen}>
+                    <DialogTitle>{disease}</DialogTitle>
+                    <DialogContent>
+                      <div className="   mt-5 pl-2 bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-20  ">
+                        <Button
+                          className="font-bold"
+                          size="lg"
+                          onClick={sendImageToAPI}
+                        >
+                          OK
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               ) : (
                 <div className="bg-white mt-4 font-poppins p-4 rounded-xl shadow px-8 flex justify-center font-bold">

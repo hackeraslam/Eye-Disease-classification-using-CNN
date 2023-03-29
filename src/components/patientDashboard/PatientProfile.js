@@ -22,28 +22,36 @@ import {
   equalTo,
   onValue,
 } from "firebase/database";
+import { UncontrolledAccordion } from "reactstrap";
 
 const PatientProfile = (props) => {
   const navigate = useNavigate();
   // const auth = getAuth();
-
-  const em = "adkjf";
   const [user, setUser] = useState({});
+
   useEffect(() => {
     // Get the current user's email
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
-    console.log(currentUser.email);
+    async function getpatient() {
+      const auth = getAuth();
 
-    const userEmail = currentUser.email;
-    const dbRef = ref(getDatabase(), "patients");
-    const emailQuery = query(dbRef, orderByChild("emails"), equalTo(userEmail));
+      const currentUser = auth.currentUser;
+      console.log(currentUser.email);
 
-    onValue(emailQuery, (snapshot) => {
-      const data = Object.values(snapshot.val())[0];
-      // console.log(data.firstname);
-      setUser(data);
-    });
+      const userEmail = currentUser.email;
+      const dbRef = ref(getDatabase(), "patients");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        // console.log(data.firstname);
+        setUser(data);
+      });
+    }
+    getpatient();
   }, []);
 
   // useEffect(() => {

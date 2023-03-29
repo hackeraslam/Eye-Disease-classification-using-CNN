@@ -14,9 +14,45 @@ import degree from "../../assets/img/dashboard/doctor-profile-degree.png";
 import home from "../../assets/img/dashboard/doctor-profile-home.png";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+
+import {
+  getDatabase,
+  ref,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
 
 const DoctorProfile = (props) => {
   const navigate = useNavigate();
+
+  const [user, setUser] = useState({});
+  useEffect(() => {
+    async function getpatient() {
+      const auth = getAuth();
+
+      const currentUser = auth.currentUser;
+      console.log(currentUser.email);
+
+      const userEmail = currentUser.email;
+      const dbRef = ref(getDatabase(), "doctors");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        // console.log(data.firstname);
+        setUser(data);
+        // console.log(data.specialization);
+      });
+    }
+    getpatient();
+  }, []);
   const [doctor, setDoctor] = useState({
     name: {
       firstName: "",
@@ -77,27 +113,26 @@ const DoctorProfile = (props) => {
               <img src={name} className="h-8 w-8  " />
               <div className="flex mt-1">
                 <h2 className="ml-2">Dr.</h2>
-                <h2 className="ml-2">{doctor.name.firstName}</h2>
-                <h2 className="ml-2">{doctor.name.middleName}</h2>
-                <h2 className="ml-2">{doctor.name.surName}</h2>
+                <h2 className="ml-2">{user.firstName}</h2>
+                <h2 className="ml-2">{user.lastname}</h2>
               </div>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={birth} className="h-5 w-5 ml-1" />
-              <h2 className="ml-4">{convertDatetoString(doctor.dob)}</h2>
+              <h2 className="ml-4">{convertDatetoString(user.dob)}</h2>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={blood} className="h-6 w-6" />
-              <h2 className="ml-4">{doctor.bloodGroup}</h2>
+              <h2 className="ml-4">{user.BloodGroup}</h2>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={phone} className="h-6 w-6 " />
-              <h2 className="ml-4">+91</h2>
-              <h2 className="ml-2">{doctor.mobile}</h2>
+              <h2 className="ml-4">+92</h2>
+              <h2 className="ml-2">{user.mobile}</h2>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={mail} className="h-6 w-5 " />
-              <h2 className="ml-4 ">{doctor.email}</h2>
+              <h2 className="ml-4 ">{user.emails}</h2>
             </div>
           </div>
         </div>
@@ -107,26 +142,22 @@ const DoctorProfile = (props) => {
               <img src={home} className="h-6 w-6" />
               <div className="ml-4">
                 <h2>
-                  {`${doctor.address.building},  ${doctor.address.city},  ${doctor.address.taluka},  ${doctor.address.district},  ${doctor.address.state}-  ${doctor.address.pincode}`}
+                  {/* {`${user.address.building},  ${user.address.city},  ${user.address.taluka},  ${user.address.district},  ${user.address.state}-  ${user.address.pincode}`} */}
                 </h2>
               </div>
             </div>
-            <div className="flex mt-4">
+            {/* <div className="flex mt-4">
               <img src={degree} className="h-6 w-6" />
-              <h1 className="ml-4">
-                {doctor.education.map((i) => {
-                  return `${i.degree}  `;
-                })}
-              </h1>
-            </div>
-            <div className="flex mt-4">
+              <h1 className="ml-4">{user.address}</h1>
+            </div> */}
+            {/* <div className="flex mt-4">
               <img src={speciality} className="h-6 w-6" />
               <h1 className="ml-4">
                 {doctor.specialization.map((i) => {
                   return `${i.special}  `;
                 })}
               </h1>
-            </div>
+            </div> */}
           </div>
           <div className="p-8 m-2 bg-white shadow-md w-2/3 rounded-md mt-10">
             <h1 className="font-bold flex justify-center text-xl">
@@ -134,13 +165,13 @@ const DoctorProfile = (props) => {
             </h1>
             <div className="flex mt-4 ">
               <img src={hospital} className="h-6 w-6" />
-              <h1 className="ml-4"> {doctor.org}</h1>
+              <h1 className="ml-4"> {user.org}</h1>
             </div>
 
             <div className="flex mt-3">
               <img src={hospital_contact} className="w-5 h-5 " />
 
-              <h1 className="ml-4">{doctor.orgNumber}</h1>
+              <h1 className="ml-4">{user.orgNumber}</h1>
             </div>
             {/* <div className="flex mt-3">
               <img src={mail} className="w-5 h-6 " />
@@ -152,7 +183,7 @@ const DoctorProfile = (props) => {
               <img src={address} className="h-7 w-8" />
               <div className="ml-4 ">
                 <h2>
-                  {`${doctor.orgAddress.building},  ${doctor.orgAddress.city},  ${doctor.orgAddress.taluka},  ${doctor.orgAddress.district},  ${doctor.orgAddress.state}-  ${doctor.orgAddress.pincode}`}
+                  {/* {`${user.orgAddress.building},  ${user.orgAddress.city},  ${user.orgAddress.taluka},  ${user.orgAddress.district},  ${user.orgAddress.state}-  ${user.orgAddress.pincode}`} */}
                 </h2>
               </div>
             </div>

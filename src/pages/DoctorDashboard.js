@@ -7,12 +7,25 @@ import eye from "../assets/img/dashboard/eye.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ReactLoading from "react-loading";
+import { getAuth } from "firebase/auth";
+
+import {
+  getDatabase,
+  ref,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
 const DoctorDashboard = (props) => {
   const [Loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [dob, setDob] = useState("01/01/2006");
   const [patient, setPatient] = useState({});
   const [prescriptions, setPrescriptions] = useState([{}]);
+
+  const [user, setUser] = useState({});
+
   const [doctor, setDoctor] = useState({
     name: {
       firstName: "",
@@ -59,57 +72,28 @@ const DoctorDashboard = (props) => {
 
   useEffect(() => {
     async function getdoctor() {
-      const res = await fetch("/getdoctor");
-      const data = await res.json();
-      if (data.AuthError) {
-        props.settoastCondition({
-          status: "info",
-          message: "Please Login to Proceed!!!",
-        });
-        props.setToastShow(true);
-        navigate("/");
-      } else {
-        setDoctor(data.doctor);
-      }
-    }
-    async function getpatient() {
-      setLoading(true);
-      if (props.healthID.length === 12) {
-        const res = await fetch(`/searchpatient/${props.healthID}`);
-        const data = await res.json();
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      console.log(currentUser.email);
 
-        if (data.AuthError) {
-          setLoading(false);
-          props.settoastCondition({
-            status: "info",
-            message: "Please Login to proceed!!!",
-          });
-          props.setToastShow(true);
-          navigate("/");
-        } else if (data.error) {
-          setLoading(false);
-          props.settoastCondition({
-            status: "error",
-            message: "This HealthID doesn't exist!!!",
-          });
-          props.setToastShow(true);
-        } else {
-          setPatient(data.patient);
-          if (data.patient.prescriptions) {
-            setPrescriptions(data.patient.prescriptions.reverse());
-          }
-          setDob(convertDatetoString(patient.dob));
-          setLoading(false);
-        }
-      } else if (props.healthID.length === 0) {
-        setLoading(false);
-        setPatient({});
-      }
-      setLoading(false);
+      const userEmail = currentUser.email;
+      const dbRef = ref(getDatabase(), "doctors");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        // console.log(data.firstname);
+        setUser(data);
+      });
     }
+
     getdoctor();
-    getpatient();
-  }, [dob]);
+    // getpatient();
+  }, []);
 
   const searchPatient = async (e) => {
     e.preventDefault();
@@ -183,12 +167,12 @@ const DoctorDashboard = (props) => {
                   <div className="grid grid-rows-2 ml-4 gap-2  mb-4">
                     <div className="font-bold font-poppins text-base">
                       <h1 className="">
-                        {`Dr. ${doctor.name.firstName} ${doctor.name.surName}`}
+                        {`Dr. ${user.firstName} ${user.lastname}`}
                       </h1>
                     </div>
                     <div className="">
                       <h2 className="text-sm">
-                        {doctor.specialization[0].special}
+                        {/* {user.specialization[0].special} */}
                       </h2>
                     </div>
                   </div>

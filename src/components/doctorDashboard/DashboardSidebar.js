@@ -6,15 +6,20 @@ import patient_profile from "../../assets/img/dashboard/patient2_pbl.png";
 import logoutimg from "../../assets/img/dashboard/logout.png";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { signOut, getAuth } from "firebase/auth";
 const DashboardSidebar = (props) => {
   const navigate = useNavigate();
   const logout = async () => {
-    props.settoastCondition({
-      status: "success",
-      message: "Logged out Successfully!!!",
-    });
-    props.setToastShow(true);
-    navigate("/");
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+        navigate("/");
+        console.log("Signed out successfully");
+      })
+      .catch((error) => {
+        // An error happened.
+      });
   };
 
   const [Toggle, setToggle] = useState("Dashboard");
