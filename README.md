@@ -2,6 +2,7 @@ Prerequisites
 Before you begin, you need to make sure that you have the following software installed on your machine:
 
 Node.js (v10 or later)
+
 npm (v6 or later)
 Python (v3 or later)
 Installation
