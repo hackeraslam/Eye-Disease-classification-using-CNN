@@ -54,24 +54,6 @@ const PatientProfile = (props) => {
     getpatient();
   }, []);
 
-  // useEffect(() => {
-  //   async function getpatient() {
-  //     const res = await fetch("/getpatient");
-  //     const data = await res.json();
-  //     if (data.AuthError) {
-  //       props.settoastCondition({
-  //         status: "info",
-  //         message: "Please Login to proceed!!!",
-  //       });
-  //       props.setToastShow(true);
-  //       navigate("/");
-  //     } else {
-  //       setPatient(data.patient);
-  //     }
-  //   }
-  //   getpatient();
-  // }, []);
-
   const convertDatetoString = (dateString) => {
     let date = new Date(dateString);
     let day = date.getDate();
