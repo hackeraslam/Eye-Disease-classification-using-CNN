@@ -1,12 +1,11 @@
 import patient_profile from "../assets/img/dashboard/patient2_pbl.png";
-
 import reports from "../assets/img/dashboard/report2_pbl.png";
-
 import search from "../assets/img/dashboard/search2.png";
 import Footer from "../components/landingPage/Footer";
 import eye from "../assets/img/dashboard/eye.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { uid } from "uid";
 import {
   Dialog,
   DialogContent,
@@ -14,22 +13,51 @@ import {
   DialogTitle,
   Button,
 } from "@material-ui/core";
-
-// import { Button } from "bootstrap";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import {
+  getDatabase,
+  set,
+  ref as dbref,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
+import(getDatabase);
 
 const PatientDashboard = (props) => {
+  const [user, setUser] = useState({});
+
   const navigate = useNavigate();
   function uploadImage(e) {
     console.log(e.target.files);
     setFile(URL.createObjectURL(e.target.files[0]));
   }
+
+  const generateId = () => {
+    const chars =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let id = "";
+    for (let i = 0; i < 10; i++) {
+      id += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return id;
+  };
+
+  const storage = getStorage();
+  const auth = getAuth();
   const date = new Date();
+  const database = getDatabase();
+  // const database = getDatabase();
   const [dob, setDob] = useState("01/01/2006");
   const [file, setFile] = useState();
   const [imag, set_imag] = useState();
   const [disease, setDisease] = useState();
   const [open, setopen] = useState();
   const handleOpen = () => setopen(!open);
+  const [dis, setdis] = useState();
   const [patient, setPatient] = useState({
     name: {
       firstName: "",
@@ -69,8 +97,33 @@ const PatientDashboard = (props) => {
       },
     },
   });
+
   const [prescriptions, setPrescriptions] = useState([{}]);
 
+  useEffect(() => {
+    // Get the current user's email
+    async function getpatient() {
+      const auth = getAuth();
+
+      const currentUser = auth.currentUser;
+      console.log(currentUser.email);
+
+      const userEmail = currentUser.email;
+      const dbRef = dbref(database, "patients");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        console.log(data.firstname);
+        setUser(data);
+      });
+    }
+    getpatient();
+  }, []);
   async function sendImageToAPI() {
     const formData = new FormData();
     formData.append("image", file);
@@ -84,8 +137,31 @@ const PatientDashboard = (props) => {
     console.log(result.result);
     if (result.result === 0) {
       setDisease("Your Eye is Effected with Cataract Disease");
+      setdis("Cataract");
     } else {
       setDisease("Congrats, Your Eye is Normal");
+      setdis("Normal");
+    }
+    const userid = uid();
+    const userEmail = auth.currentUser.email;
+    const uniqueId = Date.now().toString(); // generate a unique ID using the current timestamp
+    const imageRef = ref(storage, `${userEmail}/${uniqueId}`);
+
+    try {
+      const snapshot = await uploadBytes(imageRef, file);
+      console.log("Uploaded a file!", snapshot);
+      const url = await getDownloadURL(snapshot.ref);
+      console.log(url);
+      set(dbref(database, "reports/" + userid), {
+        reportID: uniqueId,
+        link: url,
+        email: userEmail,
+        disease: dis,
+        date: new Date().toLocaleDateString(),
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      // Handle the error here
     }
     return result.result;
   }
@@ -97,26 +173,6 @@ const PatientDashboard = (props) => {
     let year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-  // useEffect(() => {
-  //   async function getpatient() {
-  //     const res = await fetch("/getpatient");
-  //     const data = await res.json();
-  //     if (data.AuthError) {
-  //       props.settoastCondition({
-  //         status: "info",
-  //         message: "Please Login to proceed!!!",
-  //       });
-  //       props.setToastShow(true);
-  //       navigate("/");
-  //     } else {
-  //       setPatient(data.patient);
-  //       if (data.patient.prescriptions) {
-  //         setPrescriptions(data.patient.prescriptions.reverse());
-  //       }
-  //     }
-  //   }
-  //   getpatient();
-  // }, [dob]);
 
   return (
     <div className="full-body col-span-10 h-screen">
@@ -148,7 +204,7 @@ const PatientDashboard = (props) => {
                     alt="profile"
                   ></img>
                   <div className="mt-4 ml-4  font-bold font-poppins">
-                    <h1>{`${patient.name.firstName}  ${patient.name.surName}`}</h1>
+                    <h1>{`${user.firstname}  ${user.lastname}`}</h1>
                   </div>
                 </button>
               </Link>
@@ -168,9 +224,8 @@ const PatientDashboard = (props) => {
                     <h1>Name : </h1>
                   </div>
                   <div className="flex ml-2   ">
-                    <h1 className="pl-1">{patient.name.firstName}</h1>
-                    <h1 className="pl-1">{patient.name.middleName}</h1>
-                    <h1 className="pl-1">{patient.name.surName}</h1>
+                    <h1 className="pl-1">{user.firstname}</h1>
+                    <h1 className="pl-1">{user.lastname}</h1>
                   </div>
                 </div>
                 <div className="flex">
@@ -178,7 +233,7 @@ const PatientDashboard = (props) => {
                     <h1>Date : </h1>
                   </div>
                   <div className="ml-2">
-                    <h1>{convertDatetoString(patient.dob)}</h1>
+                    <h1>{convertDatetoString(user.dob)}</h1>
                   </div>
                 </div>
                 <div className="flex">
@@ -186,21 +241,15 @@ const PatientDashboard = (props) => {
                     <h1>Blood group : </h1>
                   </div>
                   <div className="ml-2">
-                    <h1>{patient.bloodGroup}</h1>
+                    <h1>{user.BloodGroup}</h1>
                   </div>
-                </div>
-                <div>
-                  <h1 className="font-bold mt-4">Past Health History</h1>
-                  <div>{`${patient.diseases[0].disease} (${patient.diseases[0].yrs} yrs.)`}</div>
                 </div>
               </div>
             </div>
             {/* recent health check up start */}
             <div className="m-4 p-4 ">
               <div>
-                <h1 className="font-bold font-poppins text-xl ">
-                  Recent Eye Checkup
-                </h1>
+                <h1 className="font-bold font-poppins text-xl ">Eye Checkup</h1>
               </div>
               {prescriptions.length > 0 ? (
                 <div className="bg-white mt-4 font-poppins p-4 rounded-xl shadow px-8">
@@ -239,7 +288,7 @@ const PatientDashboard = (props) => {
                         <Button
                           className="font-bold"
                           size="lg"
-                          onClick={sendImageToAPI}
+                          onClick={handleOpen}
                         >
                           OK
                         </Button>
@@ -259,11 +308,11 @@ const PatientDashboard = (props) => {
           </div>
 
           <div className="font-poppins m-4  ">
-            <div className="flex justify-between m-8">
+            {/* <div className="flex justify-between m-8">
               <div className="font-bold text-xl ml-4">
                 <h1>Patient Dashboard</h1>
               </div>
-            </div>
+            </div> */}
             <div className="bg-white m-4 rounded-lg ">
               <div className="grid grid-rows-2 p-6 gap-2 shadow">
                 <div className="grid grid-cols-4 font-bold  ">
@@ -271,14 +320,12 @@ const PatientDashboard = (props) => {
                     <h1>Date</h1>
                   </div>
                   <div>
-                    <h1>Doctor Name</h1>
+                    <h1>Report ID</h1>
                   </div>
                   <div>
                     <h1>Diagnosis</h1>
                   </div>
-                  {/* <div>
-                    <h1>Prescription</h1>
-                  </div> */}
+
                   <hr></hr>
                   <hr></hr>
                   <hr></hr>

@@ -59,13 +59,12 @@ const PatientReports = (props) => {
     async function getpatient() {
       const res = await fetch("/getpatient");
       const data = await res.json();
-       
-        setPatient(data.patient);
-        if (data.patient.prescriptions) {
-          setPrescriptions(data.patient.prescriptions.reverse());
-        }
-        setDob(convertDatetoString(patient.dob));
-      
+
+      setPatient(data.patient);
+      if (data.patient.prescriptions) {
+        setPrescriptions(data.patient.prescriptions.reverse());
+      }
+      setDob(convertDatetoString(patient.dob));
     }
     getpatient();
   }, [dob]);
@@ -97,19 +96,17 @@ const PatientReports = (props) => {
             </div>
             <div className="bg-white m-4 rounded-lg ">
               <div className="grid grid-rows-2 p-6 gap-2 shadow">
-                <div className="grid grid-cols-4 font-bold ">
+                <div className="grid grid-cols-3 font-bold ">
                   <div>
                     <h1>Date</h1>
                   </div>
                   <div>
-                    <h1>Doctor Name</h1>
+                    <h1>Report ID</h1>
                   </div>
                   <div>
                     <h1>Diagnosis</h1>
                   </div>
-                  <div>
-                    <h1>Prescription</h1>
-                  </div>
+
                   <hr></hr>
                   <hr></hr>
                   <hr></hr>
