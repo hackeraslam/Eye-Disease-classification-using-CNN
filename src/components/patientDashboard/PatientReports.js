@@ -3,49 +3,24 @@ import patient_profile from "../../assets/img/dashboard/patient2_pbl.png";
 import PatientReportCompo from "./PatientReportCompo";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+import {
+  getDatabase,
+  set,
+  ref as dbref,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
+import(getDatabase);
 const PatientReports = (props) => {
+  const auth = getAuth();
+  const database = getDatabase();
   const navigate = useNavigate();
-  const [dob, setDob] = useState("01/01/2006");
-  const [patient, setPatient] = useState({
-    name: {
-      firstName: "",
-      middleName: "",
-      surName: "",
-    },
-    dob: "",
-    mobile: "",
-    email: "",
-    adharCard: "",
-    bloodGroup: "",
-    address: {
-      building: "",
-      city: "",
-      taluka: "",
-      district: "",
-      state: "",
-      pincode: "",
-    },
-    password: "",
-    diseases: [{ disease: "", yrs: "" }],
-    contactPerson: {
-      name: {
-        firstName: "",
-        surName: "",
-      },
-      mobile: "",
-      email: "",
-      relation: "",
-      address: {
-        building: "",
-        city: "",
-        taluka: "",
-        district: "",
-        state: "",
-        pincode: "",
-      },
-    },
-  });
-  const [prescriptions, setPrescriptions] = useState([{}]);
+  const [user, setUser] = useState({});
+
+  const [prescriptions, setPrescriptions] = useState([]);
 
   const convertDatetoString = (dateString) => {
     let date = new Date(dateString);
@@ -56,18 +31,57 @@ const PatientReports = (props) => {
   };
 
   useEffect(() => {
-    async function getpatient() {
-      const res = await fetch("/getpatient");
-      const data = await res.json();
+    // Get the current user's email
+    async function getReport() {
+      // 2. Get a reference to the reports node in the Firebase Realtime Database
+      // const reportsRef = database.ref("reports");
+      const currentUser = auth.currentUser;
 
-      setPatient(data.patient);
-      if (data.patient.prescriptions) {
-        setPrescriptions(data.patient.prescriptions.reverse());
-      }
-      setDob(convertDatetoString(patient.dob));
+      console.log(currentUser.email);
+      const userEmail = currentUser.email;
+      const dbRef = dbref(database, "reports");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("email"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = snapshot.val();
+        const reports = [];
+        // setPrescriptions({})
+        console.log(snapshot.val());
+        snapshot.forEach((reportSnapshot) => {
+          const report = reportSnapshot.val();
+          prescriptions.push(report);
+        });
+        console.log(prescriptions);
+      });
     }
+
+    async function getpatient() {
+      const auth = getAuth();
+
+      const currentUser = auth.currentUser;
+      console.log(currentUser.email);
+
+      const userEmail = currentUser.email;
+      const dbRef = dbref(database, "patients");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        console.log(data.firstname);
+        setUser(data);
+      });
+    }
+    getReport();
     getpatient();
-  }, [dob]);
+  }, []);
   return (
     <div className="col-span-10">
       <div className=" px-12">
@@ -83,7 +97,7 @@ const PatientReports = (props) => {
                 <div className="grid grid-rows-2 ml-4 gap-2  mb-4">
                   <div className="mt-4 ml-4  font-bold font-poppins">
                     <h1 className="ml-2">
-                      {`${patient.name.firstName} ${patient.name.surName}`}
+                      {`${user.firstname} ${user.lastname}`}
                     </h1>
                   </div>
                 </div>
@@ -96,7 +110,7 @@ const PatientReports = (props) => {
             </div>
             <div className="bg-white m-4 rounded-lg ">
               <div className="grid grid-rows-2 p-6 gap-2 shadow">
-                <div className="grid grid-cols-3 font-bold ">
+                <div className="grid grid-cols-4 font-bold ">
                   <div>
                     <h1>Date</h1>
                   </div>

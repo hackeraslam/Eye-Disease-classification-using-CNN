@@ -2,115 +2,72 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import patient_profile from "../../assets/img/dashboard/patient2_pbl.png";
 import Footer from "../landingPage/Footer";
+import { getAuth } from "firebase/auth";
+import {
+  getDatabase,
+  set,
+  ref as dbref,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
+import(getDatabase);
 const PreviewPrescription = (props) => {
-  //   function printPrescription() {
-  //     var mywindow = window.open("", "PRINT", "height=full,width=full");
+  function printPrescription(id) {
+    console.log("print");
+  }
 
-  //     mywindow.document.write(
-  //       "<html><head><title>" + document.title + "</title> "
-  //     );
-  //     mywindow.document.write("</head><body >");
-  //     mywindow.document.write("<h1>" + document.title + "</h1>");
-  //     mywindow.document.write(document.getElementById("prescription").innerHTML);
-  //     mywindow.document.write("</body></html>");
-  //     // necessary for IE >= 10*/
-
-  //     mywindow.print();
-  //     mywindow.close();
-
-  //     return true;
-  //   }
-
-  const convertDatetoString = (dateString) => {
-    let date = new Date(dateString);
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
+  const [user, setUser] = useState({});
+  const database = getDatabase();
 
   const navigate = useNavigate();
-  const [prescription, setPrescription] = useState({
-    doctor: "",
-    doctormobile: "",
-    hospital: {
-      name: "",
-      address: "",
-      mobile: "",
-    },
-    chiefComplaints: [{ complaint: "", duration: "", finding: "" }],
-    notes: "",
-    diagnosis: "",
-    procedureConducted: "",
-    medicines: [
-      {
-        medicineName: "",
-        type: "",
-        dosage: {
-          morning: { quantity: "", remark: "" },
-          afternoon: { quantity: "", remark: "" },
-          evening: { quantity: "", remark: "" },
-        },
-        duration: "",
-        total: "",
-      },
-    ],
-    investigations: [{ investigation: "" }],
-    advices: [{ advice: "" }],
-  });
-  const [patient, setPatient] = useState({
-    name: {
-      firstName: "",
-      middleName: "",
-      surName: "",
-    },
-    address: {
-      building: "",
-      city: "",
-      taluka: "",
-      district: "",
-      state: "",
-      pincode: "",
-    },
-  });
+
+  const [report, setReport] = useState([]);
+
+  const [reportID, setRepordID] = useState(0);
   useEffect(() => {
-    async function fetchprescription() {
-      // const res = await fetch(`/prescription/${props.prescriptionID}`);
-      // const data = await res.json();
-      // if (data.AuthError) {
-      //   props.settoastCondition({
-      //     status: "info",
-      //     message: "Please Login to proceed!!!",
-      //   });
-      //   props.setToastShow(true);
-      //   navigate("/");
-      // } else if (data.error) {
-      //   props.settoastCondition({
-      //     status: "error",
-      //     message: "Something went Wrong!!!",
-      //   });
-      //   props.setToastShow(true);
-      //   navigate("/patient/dashboard");
-      // } else {
-      // setPrescription(data.prescription[0]);
-      // }
+    async function getReport() {
+      setRepordID(props.prescriptionID);
+      // console.log(props.prescriptionID);
+      const dbRef = dbref(database, "reports");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("reportID"),
+        equalTo(props.prescriptionID)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val());
+        console.log(data);
+        setReport(data);
+      });
     }
-    async function fetchpatient() {
-      // const res = await fetch("/getpatient");
-      // const data = await res.json();
-      // if (data.AuthError) {
-      //   props.settoastCondition({
-      //     status: "info",
-      //     message: "Please Login to proceed!!!",
-      //   });
-      //   props.setToastShow(true);
-      //   navigate("/");
-      // } else {
-      // setPatient(data.patient);
-      // }
+
+    async function getpatient() {
+      const auth = getAuth();
+
+      const currentUser = auth.currentUser;
+      console.log(currentUser.email);
+
+      const userEmail = currentUser.email;
+      const dbRef = dbref(database, "patients");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        console.log(data.firstname);
+        setUser(data);
+      });
     }
-    fetchprescription();
-    fetchpatient();
+    getReport();
+    getpatient();
+    // console.log(report[0].disease);
+    // console.log(report[0].date);
   }, []);
 
   return (
@@ -118,67 +75,67 @@ const PreviewPrescription = (props) => {
       className="body h-screen col-span-10 font-poppins   overflow-y-scroll scroll-m-0"
       id="prescription"
     >
-      <div className="w-3/4  ml-32 bg-white shadow-xl p-8 mb-4 mt-6">
+      <div className="w-3/4  ml-32 bg-white shadow-xl p-8 mb-4 mt-6" id="print">
         <div className="grid grid-cols-2 border-b-2 border-black">
           <div className="m-2 ">
             <div className="flex font-bold">
-              <h1 className="">Dr.</h1>
-              <h1 className="ml-2 ">{prescription.doctor}</h1>
+              <h1 className="">FCAI Air University</h1>
             </div>
-            <div className="flex">
-              <h2 className="font-bold">Mobile No.</h2>
-              <h2 className="ml-2">{prescription.doctormobile}</h2>
-            </div>
-          </div>
-          <div className="m-2 ">
-            <div>
-              <h1 className="font-bold">{prescription.hospital.name}</h1>
-            </div>
-            <div className="flex">
-              <h2>{prescription.hospital.address}</h2>
-              {/* <h2 className="ml-2">425155</h2> */}
-            </div>
-            <div className="flex">
-              <h2 className="font-bold">Phone no.</h2>
-              <h2 className="ml-2">{prescription.hospital.mobile}</h2>
+            <div className="flex font-bold items-center justify-center text-4xl">
+              <h1 className="">AstralSpec</h1>
             </div>
           </div>
         </div>
         <div className="grid grid-cols-3 mt-4">
           <div className="col-span-2">
             <div className="flex">
-              <h1 className="font-bold">Health ID : </h1>
-              <h4 className="ml-2">{patient.healthID}</h4>
+              <h1 className="font-bold">ID : </h1>
+              <h4 className="ml-2">{reportID}</h4>
+            </div>
+            <div className="flex">
+              <h1 className="font-bold">Email : </h1>
+              <h4 className="ml-2">{user.emails}</h4>
             </div>
             <div className="flex">
               <h1 className="font-bold">Patient Name : </h1>
               <div className="flex">
-                <h2 className="pl-1">{patient.name.firstName}</h2>
-                <h2 className="pl-1">{patient.name.middleName}</h2>
-                <h2 className="pl-1">{patient.name.surName}</h2>
+                <h2 className="pl-1">{user.firstname}</h2>
+                <h2 className="pl-1">{user.lastname}</h2>
               </div>
             </div>
             <div className="flex">
               <h1 className="font-bold mr-2">Address: </h1>
-              <h4>{`${patient.address.building},  ${patient.address.city},  ${patient.address.taluka},  ${patient.address.district},  ${patient.address.state},  ${patient.address.pincode}`}</h4>
+              <h4>{`${user.area},  ${user.city},  ${user.district},  ${user.state}`}</h4>
             </div>
           </div>
           <div>
             <div className="flex">
               <h1 className="font-bold">Date : </h1>
-              <h4 className="ml-2">
-                {convertDatetoString(prescription.createdAt)}
-              </h4>
+              <h4 className="ml-2">{report[0]?.date}</h4>
             </div>
           </div>
         </div>
 
         <div className="mt-2">
           <h1 className="font-bold">Diagnosis</h1>
-          <h4 className="ml-2">{prescription.diagnosis}</h4>
+          <h4 className="ml-2">{report[0]?.disease}</h4>
+        </div>
+
+        <div>
+          {report[0]?.link ? (
+            <img src={report[0]?.link} alt="firebase-image" />
+          ) : (
+            <p>Loading image...</p>
+          )}
         </div>
       </div>
       <Footer />
+      <button
+        className="flex justify-center items-center bg-primary py-1 px-3 rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary"
+        onClick={printPrescription("print")}
+      >
+        Print
+      </button>
     </div>
   );
 };

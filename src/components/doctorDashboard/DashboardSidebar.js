@@ -32,7 +32,7 @@ const DashboardSidebar = (props) => {
           </div>
           <div className="heading font-poppins font-bold text-xl  ">
             <Link to="/">
-              <h1>Public health Record System</h1>
+              <h1>AstralSpec</h1>
             </Link>
           </div>
         </div>

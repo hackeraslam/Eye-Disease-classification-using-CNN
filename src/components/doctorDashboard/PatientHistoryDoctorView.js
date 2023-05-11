@@ -68,6 +68,7 @@ const PatientHistoryDoctorView = (props) => {
         setDoctor(data.doctor);
       }
     }
+
     async function getpatient() {
       if (props.healthID.length === 12) {
         const res = await fetch(`/searchpatient/${props.healthID}`);
@@ -90,6 +91,7 @@ const PatientHistoryDoctorView = (props) => {
         setPatient({});
       }
     }
+
     getdoctor();
     getpatient();
   }, [dob]);
