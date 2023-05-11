@@ -51,57 +51,42 @@ const PatientDashboard = (props) => {
   const date = new Date();
   const database = getDatabase();
   // const database = getDatabase();
-  const [dob, setDob] = useState("01/01/2006");
+  // const [dob, setDob] = useState("01/01/2006");
   const [file, setFile] = useState();
   const [imag, set_imag] = useState();
   const [disease, setDisease] = useState();
   const [open, setopen] = useState();
   const handleOpen = () => setopen(!open);
   const [dis, setdis] = useState();
-  const [patient, setPatient] = useState({
-    name: {
-      firstName: "",
-      middleName: "",
-      surName: "",
-    },
-    dob: "",
-    mobile: "",
-    email: "",
-    adharCard: "",
-    bloodGroup: "",
-    address: {
-      building: "",
-      city: "",
-      taluka: "",
-      district: "",
-      state: "",
-      pincode: "",
-    },
-    password: "",
-    diseases: [{ disease: "", yrs: "" }],
-    contactPerson: {
-      name: {
-        firstName: "",
-        surName: "",
-      },
-      mobile: "",
-      email: "",
-      relation: "",
-      address: {
-        building: "",
-        city: "",
-        taluka: "",
-        district: "",
-        state: "",
-        pincode: "",
-      },
-    },
-  });
-
-  const [prescriptions, setPrescriptions] = useState([{}]);
+  const [reports, setReport] = useState({});
 
   useEffect(() => {
     // Get the current user's email
+    async function getReport() {
+      // 2. Get a reference to the reports node in the Firebase Realtime Database
+      // const reportsRef = database.ref("reports");
+      const currentUser = auth.currentUser;
+      console.log(currentUser.email);
+
+      const userEmail = currentUser.email;
+      const dbRef = dbref(database, "reports");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("email"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = snapshot.val();
+        const reports = [];
+        snapshot.forEach((reportSnapshot) => {
+          const report = reportSnapshot.val();
+          reports.push(report);
+        });
+        console.log(reports);
+      });
+    }
+
     async function getpatient() {
       const auth = getAuth();
 
@@ -122,6 +107,7 @@ const PatientDashboard = (props) => {
         setUser(data);
       });
     }
+    getReport();
     getpatient();
   }, []);
   async function sendImageToAPI() {
@@ -251,57 +237,51 @@ const PatientDashboard = (props) => {
               <div>
                 <h1 className="font-bold font-poppins text-xl ">Eye Checkup</h1>
               </div>
-              {prescriptions.length > 0 ? (
-                <div className="bg-white mt-4 font-poppins p-4 rounded-xl shadow px-8">
-                  <div className="flex">
-                    <div>
-                      <h1>Date :</h1>
-                    </div>
-                    <div className="ml-2">
-                      <h1>{convertDatetoString(date)}</h1>
-                    </div>
-                  </div>
 
-                  <input
-                    type="file"
-                    onChange={(e) => {
-                      console.log(e.target.files[0]);
-                      setFile(e.target.files[0]);
-                      setDisease("Loading");
-                      set_imag(URL.createObjectURL(e.target.files[0]));
-                    }}
-                  />
-                  <img width={200} height={200} src={imag} alt="" />
-                  <div className=" mx-50   mt-5 pl-5  bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-40  ">
-                    <Button
-                      className="font-bold"
-                      size="lg"
-                      onClick={sendImageToAPI}
-                    >
-                      Check Disease
-                    </Button>
+              <div className="bg-white mt-4 font-poppins p-4 rounded-xl shadow px-8">
+                <div className="flex">
+                  <div>
+                    <h1>Date :</h1>
                   </div>
-                  <Dialog open={open} handler={handleOpen}>
-                    <DialogTitle>{disease}</DialogTitle>
-                    <DialogContent>
-                      <div className="   mt-5 pl-2 bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-20  ">
-                        <Button
-                          className="font-bold"
-                          size="lg"
-                          onClick={handleOpen}
-                        >
-                          OK
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <div className="ml-2">
+                    <h1>{convertDatetoString(date)}</h1>
+                  </div>
                 </div>
-              ) : (
-                <div className="bg-white mt-4 font-poppins p-4 rounded-xl shadow px-8 flex justify-center font-bold">
-                  {" "}
-                  No Data Found...{" "}
+
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    console.log(e.target.files[0]);
+                    setFile(e.target.files[0]);
+                    setDisease("Loading");
+                    set_imag(URL.createObjectURL(e.target.files[0]));
+                  }}
+                />
+                <img width={100} height={100} src={imag} alt="" />
+                <div className=" mx-50   mt-5 pl-5  bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-40  ">
+                  <Button
+                    className="font-bold"
+                    size="lg"
+                    onClick={sendImageToAPI}
+                  >
+                    Check Disease
+                  </Button>
                 </div>
-              )}
+                <Dialog open={open} handler={handleOpen}>
+                  <DialogTitle>{disease}</DialogTitle>
+                  <DialogContent>
+                    <div className="   mt-5 pl-2 bg-primary  rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-20  ">
+                      <Button
+                        className="font-bold"
+                        size="lg"
+                        onClick={handleOpen}
+                      >
+                        OK
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
             {/* recent health check up end */}
             <div></div>
@@ -325,48 +305,45 @@ const PatientDashboard = (props) => {
                   <div>
                     <h1>Diagnosis</h1>
                   </div>
-
+                  <div>
+                    <h1></h1>
+                  </div>
                   <hr></hr>
                   <hr></hr>
                   <hr></hr>
                   <hr></hr>
                 </div>
-
-                {prescriptions.length > 1 ? (
-                  prescriptions.slice(1, 3).map((prescription) => {
-                    return (
-                      <div className="grid grid-cols-4">
-                        <div>
-                          <h1>{convertDatetoString(prescription.createdAt)}</h1>
+                <div className="grid grid-cols-3">
+                  {reports.length >= 0 ? (
+                    reports.slice(0, 3).map((report) => {
+                      return (
+                        <div key={report.reportID}>
+                          <h1>{convertDatetoString(report.date)}</h1>
+                          <h1>{report.disease}</h1>
+                          <Link
+                            to="/patient/prescription"
+                            onClick={() =>
+                              props.setPrescriptionID(report.reportID)
+                            }
+                          >
+                            <div className="flex justify-center bg-primary py-1 px-3 rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-2/5">
+                              <img
+                                src={eye}
+                                className="h-4 my-auto"
+                                alt="preview"
+                              ></img>
+                              <button className="font-bold ml-2">
+                                Preview
+                              </button>
+                            </div>
+                          </Link>
                         </div>
-                        <div className="flex">
-                          <h1>Dr. </h1>
-                          <h1>{prescription.doctor}</h1>
-                        </div>
-                        <div>
-                          <h1>{prescription.diagnosis}</h1>
-                        </div>
-                        <Link
-                          to="/patient/prescription"
-                          onClick={() =>
-                            props.setPrescriptionID(prescription._id)
-                          }
-                        >
-                          <div className=" flex  justify-center bg-primary py-1 px-3 rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-2/5   ">
-                            <img
-                              src={eye}
-                              className="h-4 my-auto"
-                              alt="preview"
-                            ></img>
-                            <button className="font-bold ml-2">Preview </button>
-                          </div>
-                        </Link>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="mx-auto mt-3 mb-5">No Records Found...</div>
-                )}
+                      );
+                    })
+                  ) : (
+                    <div className="mx-auto mt-3 mb-5">No Records Found...</div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
