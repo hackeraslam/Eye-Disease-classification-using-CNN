@@ -4,7 +4,16 @@ import minus_logo from "../../assets/img/dashboard/minus2_pbl.png";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ReactLoading from "react-loading";
-
+import {
+  getDatabase,
+  set,
+  ref,
+  push,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
 const AddNewDiagnosis = (props) => {
   const navigate = useNavigate();
   const [Loading, setLoading] = useState(false);
@@ -29,9 +38,12 @@ const AddNewDiagnosis = (props) => {
   // // const [clinicalFindings, setClinicalFindings] = useState([{ finding: "" }]);
   const [investigations, setInvestigations] = useState([{ investigation: "" }]);
   const [advices, setAdvices] = useState([{ advice: "" }]);
-
+  useEffect(() => {
+    console.log(props.healthID);
+  });
   const [prescription, setPrescription] = useState({
     doctor: "",
+    email: props.healthID,
     doctormobile: "",
     hospital: {
       name: "",
@@ -46,8 +58,60 @@ const AddNewDiagnosis = (props) => {
     investigations: investigations,
     advices: advices,
   });
+  const database = getDatabase();
+  const handleAddPrescription = async (e) => {
+    e.preventDefault();
+    try {
+      const prescriptionRef = ref(database, "Prescriptions");
 
-  const handleAddPrescription = async (e) => {};
+      // Generate a new unique key for the prescription
+      const newPrescriptionRef = push(prescriptionRef);
+      set(newPrescriptionRef, prescription);
+      setMedicineList([
+        {
+          medicineName: "",
+          type: "",
+          dosage: {
+            morning: { quantity: "", remark: "" },
+            afternoon: { quantity: "", remark: "" },
+            evening: { quantity: "", remark: "" },
+          },
+          duration: "",
+          total: "",
+        },
+      ]);
+      setChiefComplaints([{ complaint: "", duration: "", finding: "" }]);
+      setInvestigations([{ investigation: "" }]);
+      setAdvices([{ advice: "" }]);
+      setPrescription({
+        doctor: "",
+        doctormobile: "",
+        hospital: { name: "", address: "", mobile: "" },
+        chiefComplaints: [{ complaint: "", duration: "", finding: "" }],
+        notes: { note: "" },
+        diagnosis: { diagno: "" },
+        procedureConducted: { procedure: "" },
+        medicines: [
+          {
+            medicineName: "",
+            type: "",
+            dosage: {
+              morning: { quantity: "", remark: "" },
+              afternoon: { quantity: "", remark: "" },
+              evening: { quantity: "", remark: "" },
+            },
+            duration: "",
+            total: "",
+          },
+        ],
+        investigations: [{ investigation: "" }],
+        advices: [{ advice: "" }],
+      });
+      alert("Added Sucessfully");
+    } catch (e) {
+      alert(e);
+    }
+  };
 
   return (
     <div className="font-poppins col-span-10 overflow-y-scroll">

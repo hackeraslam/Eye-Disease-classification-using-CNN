@@ -3,7 +3,15 @@ import patient_profile from "../../assets/img/dashboard/patient2_pbl.png";
 import Footer from "../landingPage/Footer";
 import doctor_profile from "../../assets/img/dashboard/doctor2.png";
 import { useEffect, useState } from "react";
-
+import {
+  getDatabase,
+  set,
+  ref,
+  query,
+  orderByChild,
+  equalTo,
+  onValue,
+} from "firebase/database";
 const PreviewPrescriptionDoctorView = (props) => {
   // printprescriptionstart
 
@@ -45,60 +53,71 @@ const PreviewPrescriptionDoctorView = (props) => {
     investigations: [{ investigation: "" }],
     advices: [{ advice: "" }],
   });
-  const [patient, setPatient] = useState({
-    name: {
-      firstName: "",
-      middleName: "",
-      surName: "",
-    },
-    address: {
-      building: "",
-      city: "",
-      taluka: "",
-      district: "",
-      state: "",
-      pincode: "",
-    },
-  });
+  const [patient, setPatient] = useState({});
+  const database = getDatabase();
+  const [report, setreport] = useState({});
+  const [datap, setdatap] = useState({});
   useEffect(() => {
     async function fetchprescription() {
-      const res = await fetch(
-        `/viewprescription/${props.healthID}/${props.prescriptionID}`
+      const database = getDatabase();
+
+      const prescriptionRef = ref(database, "Prescriptions");
+
+      // Listen for changes in the "Prescriptions" reference
+      onValue(prescriptionRef, (snapshot) => {
+        const prescriptions = snapshot.val();
+        setdatap(Object.values(snapshot.val()));
+        console.log(datap[0].chiefComplaints[0].finding);
+
+        // do something with the prescriptions data
+      });
+    }
+    async function getreport() {
+      const userEmail = props.healthID;
+      const dbRef = ref(database, "reports");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("email"),
+        equalTo(userEmail)
       );
-      const data = await res.json();
-      if (data.AuthError) {
-        props.settoastCondition({
-          status: "info",
-          message: "Please Login to proceed!!!",
-        });
-        props.setToastShow(true);
-        navigate("/");
-      } else if (data.error) {
-        props.settoastCondition({
-          status: "error",
-          message: "Something went Wrong!!!",
-        });
-        props.setToastShow(true);
-        navigate("/doctor/dashboard");
-      } else {
-        setPrescription(data.prescription[0]);
-      }
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        // console.log(data.firstname);
+        setreport(data);
+      });
     }
     async function fetchpatient() {
-      const res = await fetch(`/searchpatient/${props.healthID}`);
-      const data = await res.json();
+      // const res = await fetch(`/searchpatient/${props.healthID}`);
+      // const data = await res.json();
 
-      if (data.AuthError) {
-        props.settoastCondition({
-          status: "info",
-          message: "Please Login to proceed!!!",
-        });
-        props.setToastShow(true);
-        navigate("/");
-      } else {
-        setPatient(data.patient);
-      }
+      // if (data.AuthError) {
+      //   props.settoastCondition({
+      //     status: "info",
+      //     message: "Please Login to proceed!!!",
+      //   });
+      //   props.setToastShow(true);
+      //   navigate("/");
+      // } else {
+      //   setPatient(data.patient);
+      // }
+      console.log("health: " + props.healthID);
+
+      const userEmail = props.healthID;
+      const dbRef = ref(database, "patients");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
+
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        console.log(data.firstname);
+        setPatient(data);
+      });
     }
+    getreport();
     fetchprescription();
     fetchpatient();
   }, []);
@@ -113,7 +132,7 @@ const PreviewPrescriptionDoctorView = (props) => {
           <div className="m-2 ">
             <div className="flex font-bold">
               <h1 className="">Dr.</h1>
-              <h1 className="ml-2 ">{prescription.doctor}</h1>
+              {/* <h1 className="ml-2 ">{prescription[0].doctor}</h1> */}
             </div>
             {/* <div className="flex">
               <h4>MBBS</h4>
@@ -121,20 +140,20 @@ const PreviewPrescriptionDoctorView = (props) => {
             </div> */}
             <div className="flex">
               <h2 className="font-bold">Mobile No.</h2>
-              <h2 className="ml-2">{prescription.doctormobile}</h2>
+              {/* <h2 className="ml-2">{data[0].doctormobile}</h2> */}
             </div>
           </div>
           <div className="m-2 ">
             <div>
-              <h1 className="font-bold">{prescription.hospital.name}</h1>
+              {/* <h1 className="font-bold">{data[0].hospital.name}</h1> */}
             </div>
             <div className="flex">
-              <h2>{prescription.hospital.address}</h2>
+              {/* <h2>{data.hospital.address}</h2> */}
               {/* <h2 className="ml-2">425155</h2> */}
             </div>
             <div className="flex">
               <h2 className="font-bold">Phone no.</h2>
-              <h2 className="ml-2">{prescription.hospital.mobile}</h2>
+              {/* <h2 className="ml-2">{data[0].hospital.mobile}</h2> */}
             </div>
             {/* <div className="flex">
               <h2 className="font-bold">Closed :</h2>
@@ -151,22 +170,19 @@ const PreviewPrescriptionDoctorView = (props) => {
             <div className="flex">
               <h1 className="font-bold">Patient Name : </h1>
               <div className="flex">
-                <h2 className="pl-1">{patient.name.firstName}</h2>
-                <h2 className="pl-1">{patient.name.middleName}</h2>
-                <h2 className="pl-1">{patient.name.surName}</h2>
+                <h2 className="pl-1">{patient.firstname}</h2>
+                <h2 className="pl-1">{patient.lastname}</h2>
               </div>
             </div>
             <div className="flex">
               <h1 className="font-bold mr-2">Address: </h1>
-              <h4>{`${patient.address.building},  ${patient.address.city},  ${patient.address.taluka},  ${patient.address.district},  ${patient.address.state},  ${patient.address.pincode}`}</h4>
+              <h4>{`${patient?.area},  ${patient?.city},   ${patient?.district},  ${patient?.state}`}</h4>
             </div>
           </div>
           <div>
             <div className="flex">
               <h1 className="font-bold">Date : </h1>
-              <h4 className="ml-2">
-                {convertDatetoString(prescription.createdAt)}
-              </h4>
+              <h4 className="ml-2">{convertDatetoString(report?.date)}</h4>
             </div>
           </div>
         </div>
@@ -180,27 +196,26 @@ const PreviewPrescriptionDoctorView = (props) => {
             <h1 className="ml-2 font-bold">Chief complaints</h1>
             <h1 className="ml-2 font-bold">clinincal findings</h1>
           </div>
-
-          {prescription.chiefComplaints.map((complaint) => {
-            return (
-              <div className="grid grid-cols-2 justify-center ml-2 border-b-2 border-gray-400">
-                <h1>{`${complaint.complaint} (${complaint.duration} days)`}</h1>
-                <h1>{complaint.finding}</h1>
-              </div>
-            );
-          })}
+          {/* {.map((complaint) => {
+            return ( */}
+          <div className="grid grid-cols-2 justify-center ml-2 border-b-2 border-gray-400">
+            <h1>{`${datap[0]?.chiefComplaints[0].complaint} (${datap[0]?.chiefComplaints[0].duration} days)`}</h1>
+            <h1>{datap[0]?.chiefComplaints[0].finding}</h1>
+          </div>
+          );
+          {/* })} */}
         </div>
         <div className="mt-2">
           <h1 className="font-bold">Notes </h1>
-          <h4 className="ml-2">{prescription.notes}</h4>
+          <h4 className="ml-2">{datap[0]?.notes.note}</h4>
         </div>
         <div className="mt-2">
           <h1 className="font-bold">Diagnosis</h1>
-          <h4 className="ml-2">{prescription.diagnosis}</h4>
+          <h4 className="ml-2">{datap[0]?.diagnosis.diagno}</h4>
         </div>
         <div className="">
           <h1 className="font-bold">Procedure Conducted</h1>
-          <h4 className="ml-2">{prescription.procedureConducted}</h4>
+          <h4 className="ml-2">{datap[0]?.procedureConducted.procedure}</h4>
         </div>
         <div className="mt-4">
           <div className="grid grid-cols-3 border-b-2 border-t-2 border-black">
@@ -208,7 +223,7 @@ const PreviewPrescriptionDoctorView = (props) => {
             <h1 className="font-bold">Dosages</h1>
             <h1 className="font-bold">Duration</h1>
           </div>
-          {prescription.medicines.map((medicine) => {
+          {datap[0]?.medicines.map((medicine) => {
             return (
               <div className="grid grid-cols-3 border-b-2 border-gray-400">
                 <div>
@@ -245,7 +260,7 @@ const PreviewPrescriptionDoctorView = (props) => {
         <div className="mt-4">
           <h1 className="font-bold">Insvestigations</h1>
           <div>
-            {prescription.investigations.map((investigation) => {
+            {datap[0]?.investigations.map((investigation) => {
               return <h3>{investigation.investigation}</h3>;
             })}
           </div>
@@ -253,7 +268,7 @@ const PreviewPrescriptionDoctorView = (props) => {
         <div className="mb-2">
           <h1 className="font-bold">Advices</h1>
           <div>
-            {prescription.advices.map((advice) => {
+            {datap[0]?.advices.map((advice) => {
               return <h3>{advice.advice}</h3>;
             })}
           </div>

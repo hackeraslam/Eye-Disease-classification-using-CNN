@@ -142,7 +142,7 @@ const DoctorProfile = (props) => {
               <img src={home} className="h-6 w-6" />
               <div className="ml-4">
                 <h2>
-                  {/* {`${user.address.building},  ${user.address.city},  ${user.address.taluka},  ${user.address.district},  ${user.address.state}-  ${user.address.pincode}`} */}
+                  {`${user?.address.building},  ${user?.address.city},  ${user?.address.taluka},  ${user?.address.district},  ${user?.address.state}-  ${user.address.pincode}`}
                 </h2>
               </div>
             </div>
@@ -150,14 +150,14 @@ const DoctorProfile = (props) => {
               <img src={degree} className="h-6 w-6" />
               <h1 className="ml-4">{user.address}</h1>
             </div> */}
-            {/* <div className="flex mt-4">
+            <div className="flex mt-4">
               <img src={speciality} className="h-6 w-6" />
               <h1 className="ml-4">
-                {doctor.specialization.map((i) => {
+                {user?.specialization.map((i) => {
                   return `${i.special}  `;
                 })}
               </h1>
-            </div> */}
+            </div>
           </div>
           <div className="p-8 m-2 bg-white shadow-md w-2/3 rounded-md mt-10">
             <h1 className="font-bold flex justify-center text-xl">
@@ -171,19 +171,19 @@ const DoctorProfile = (props) => {
             <div className="flex mt-3">
               <img src={hospital_contact} className="w-5 h-5 " />
 
-              <h1 className="ml-4">{user.orgNumber}</h1>
+              <h1 className="ml-4">{"949494993939"}</h1>
             </div>
-            {/* <div className="flex mt-3">
+            <div className="flex mt-3">
               <img src={mail} className="w-5 h-6 " />
 
-              <h1 className="mx-4">jayeshspatil1602@gmail.com</h1>
-            </div> */}
+              <h1 className="mx-4">cityhospital@gmail.com</h1>
+            </div>
 
             <div className="flex mt-6">
               <img src={address} className="h-7 w-8" />
               <div className="ml-4 ">
                 <h2>
-                  {/* {`${user.orgAddress.building},  ${user.orgAddress.city},  ${user.orgAddress.taluka},  ${user.orgAddress.district},  ${user.orgAddress.state}-  ${user.orgAddress.pincode}`} */}
+                  {`${user?.orgAddress.building},  ${user?.orgAddress.city},  ${user?.orgAddress.taluka},  ${user?.orgAddress.district},  ${user?.orgAddress.state}-  ${user?.orgAddress.pincode}`}
                 </h2>
               </div>
             </div>

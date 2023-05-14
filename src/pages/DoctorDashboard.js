@@ -26,42 +26,6 @@ const DoctorDashboard = (props) => {
 
   const [user, setUser] = useState({});
 
-  const [doctor, setDoctor] = useState({
-    name: {
-      firstName: "",
-      middleName: "",
-      surName: "",
-    },
-    org: "",
-    orgAddress: {
-      building: "",
-      city: "",
-      taluka: "",
-      district: "",
-      state: "",
-      pincode: "",
-    },
-    emergencyno: "",
-    orgNumber: "",
-    dob: "",
-    mobile: "",
-    email: "",
-    adharCard: "",
-    bloodGroup: "",
-    education: [{ degree: "" }],
-    address: {
-      building: "",
-      city: "",
-      taluka: "",
-      district: "",
-      state: "",
-      pincode: "",
-    },
-    specialization: [{ special: "" }],
-    password: "",
-    _id: "",
-  });
-
   const convertDatetoString = (dateString) => {
     let date = new Date(dateString);
     let day = date.getDate();
@@ -97,40 +61,57 @@ const DoctorDashboard = (props) => {
 
   const searchPatient = async (e) => {
     e.preventDefault();
-    if (props.healthID.length === 12) {
+    if (props.healthID.length > 5) {
       setLoading(true);
-      const res = await fetch(`/searchpatient/${props.healthID}`);
-      const data = await res.json();
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      // const res = await fetch(`/searchpatient/${props.healthID}`);
+      // const data = await res.json();
+      const database = getDatabase();
+      const userEmail = props.healthID;
+      const dbRef = ref(database, "patients");
+      const emailQuery = query(
+        dbRef,
+        orderByChild("emails"),
+        equalTo(userEmail)
+      );
 
-      if (data.AuthError) {
+      onValue(emailQuery, (snapshot) => {
+        const data = Object.values(snapshot.val())[0];
+        console.log(data?.firstname);
+        setPatient(data);
         setLoading(false);
-        props.settoastCondition({
-          status: "info",
-          message: "Please Login to proceed!!!",
-        });
-        props.setToastShow(true);
-        navigate("/");
-      } else if (data.error) {
-        setLoading(false);
-        props.settoastCondition({
-          status: "error",
-          message: "This HealthID doesn't exist!!!",
-        });
-        props.setToastShow(true);
-      } else {
-        setPatient(data.patient);
-        if (data.patient.prescriptions) {
-          setPrescriptions(data.patient.prescriptions.reverse());
-        }
-        setDob(convertDatetoString(patient.dob));
-        setLoading(false);
-      }
-    } else {
-      props.settoastCondition({
-        status: "warning",
-        message: "Please Enter 12 Digit HealthID !!!",
       });
-      props.setToastShow(true);
+
+      //   if (data.AuthError) {
+      //     setLoading(false);
+      //     props.settoastCondition({
+      //       status: "info",
+      //       message: "Please Login to proceed!!!",
+      //     });
+      //     props.setToastShow(true);
+      //     navigate("/");
+      //   } else if (data.error) {
+      //     setLoading(false);
+      //     props.settoastCondition({
+      //       status: "error",
+      //       message: "This HealthID doesn't exist!!!",
+      //     });
+      //     props.setToastShow(true);
+      //   } else {
+      //     setPatient(data.patient);
+      //     if (data.patient.prescriptions) {
+      //       setPrescriptions(data.patient.prescriptions.reverse());
+      //     }
+      //     setDob(convertDatetoString(patient.dob));
+      //     setLoading(false);
+      //   }
+      // } else {
+      //   props.settoastCondition({
+      //     status: "warning",
+      //     message: "Please Enter 12 Digit HealthID !!!",
+      //   });
+      //   props.setToastShow(true);
     }
   };
 
@@ -161,18 +142,18 @@ const DoctorDashboard = (props) => {
                 <div className="flex bg-white rounded shadow  px-4  ml-60 h-14 ">
                   <img
                     src={doctor_profile}
-                    className="w-12 p-1 rounded-2xl"
+                    className="w-14 p-1 rounded-2xl"
                     alt="profile"
                   ></img>
                   <div className="grid grid-rows-2 ml-4 gap-2  mb-4">
                     <div className="font-bold font-poppins text-base">
-                      <h1 className="">
-                        {`Dr. ${user.firstName} ${user.lastname}`}
-                      </h1>
+                      <h1 className="">{`Dr. ${user.firstName}`}</h1>
                     </div>
                     <div className="">
-                      <h2 className="text-sm">
-                        {/* {user.specialization[0].special} */}
+                      <h2 className="">
+                        {user?.specialization.map((i) => {
+                          return `${i.special}  `;
+                        })}
                       </h2>
                     </div>
                   </div>
@@ -195,7 +176,7 @@ const DoctorDashboard = (props) => {
               <input
                 placeholder="Health ID"
                 className="bg-bgsecondary rounded border-2 text-xl   pl-4  focus:outline-none"
-                type="number"
+                type="email"
                 value={props.healthID}
                 onChange={(e) => {
                   props.setHealthID(e.target.value);
@@ -249,9 +230,8 @@ const DoctorDashboard = (props) => {
                       <h1>Name : </h1>
                     </div>
                     <div className="flex justify-between">
-                      <h1 className="pl-3">{`${patient.name.firstName} `}</h1>
-                      <h1 className="pl-1">{`${patient.name.middleName} `}</h1>
-                      <h1 className="pl-1">{patient.name.surName}</h1>
+                      <h1 className="pl-3">{`${patient.firstname} `}</h1>
+                      <h1 className="pl-1">{patient.lastname}</h1>
                     </div>
                   </div>
                   <div className="flex">
@@ -267,12 +247,12 @@ const DoctorDashboard = (props) => {
                       <h1>Blood group : </h1>
                     </div>
                     <div className="ml-2">
-                      <h1>{patient.bloodGroup}</h1>
+                      <h1>{patient.BloodGroup}</h1>
                     </div>
                   </div>
                   <div>
                     <h1 className="font-bold mt-4">Past Health History</h1>
-                    <div>{`${patient.diseases[0].disease} (${patient.diseases[0].yrs} yrs.)`}</div>
+                    {/* <div>{`${patient.diseases[0].disease} (${patient.diseases[0].yrs} yrs.)`}</div> */}
                   </div>
                 </div>
               </div>
@@ -290,7 +270,7 @@ const DoctorDashboard = (props) => {
                         <h1>Consultant Doctor :</h1>
                       </div>
                       <div className="ml-2">
-                        <h1>{`Dr. ${prescriptions[0].doctor}`}</h1>
+                        {/* <h1>{`Dr. ${prescriptions[0].doctor}`}</h1> */}
                       </div>
                     </div>
                     <div className="flex">
@@ -299,7 +279,7 @@ const DoctorDashboard = (props) => {
                       </div>
                       <div className="ml-2">
                         <h1>
-                          {convertDatetoString(prescriptions[0].createdAt)}
+                          {/* {convertDatetoString(prescriptions[0].createdAt)} */}
                         </h1>
                       </div>
                     </div>
@@ -308,13 +288,13 @@ const DoctorDashboard = (props) => {
                         <h1>Diagnosis : </h1>
                       </div>
                       <div className="ml-2">
-                        <h1>{prescriptions[0].diagnosis}</h1>
+                        {/* <h1>{prescriptions[0].diagnosis}</h1> */}
                       </div>
                     </div>
                     <Link
                       to="/doctor/prescription"
                       onClick={() => {
-                        props.setPrescriptionID(prescriptions[0]._id);
+                        // props.setPrescriptionID(prescriptions[0]._id);
                       }}
                     >
                       <div className=" mt-2 flex items-center justify-evenly text-base bg-primary py-1 px-2 rounded font-semibold font-poppins shadow-sm hover:bg-bgsecondary w-5/12  ">
