@@ -113,26 +113,26 @@ const DoctorProfile = (props) => {
               <img src={name} className="h-8 w-8  " />
               <div className="flex mt-1">
                 <h2 className="ml-2">Dr.</h2>
-                <h2 className="ml-2">{user.firstName}</h2>
-                <h2 className="ml-2">{user.lastname}</h2>
+                <h2 className="ml-2">{user?.firstName}</h2>
+                <h2 className="ml-2">{user?.lastname}</h2>
               </div>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={birth} className="h-5 w-5 ml-1" />
-              <h2 className="ml-4">{convertDatetoString(user.dob)}</h2>
+              <h2 className="ml-4">{convertDatetoString(user?.dob)}</h2>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={blood} className="h-6 w-6" />
-              <h2 className="ml-4">{user.BloodGroup}</h2>
+              <h2 className="ml-4">{user?.BloodGroup}</h2>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={phone} className="h-6 w-6 " />
               <h2 className="ml-4">+92</h2>
-              <h2 className="ml-2">{user.mobile}</h2>
+              <h2 className="ml-2">{user?.mobile}</h2>
             </div>
             <div className="flex ml-8 mt-4">
               <img src={mail} className="h-6 w-5 " />
-              <h2 className="ml-4 ">{user.emails}</h2>
+              <h2 className="ml-4 ">{user?.emails}</h2>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ const DoctorProfile = (props) => {
               <img src={home} className="h-6 w-6" />
               <div className="ml-4">
                 <h2>
-                  {`${user?.address.building},  ${user?.address.city},  ${user?.address.taluka},  ${user?.address.district},  ${user?.address.state}-  ${user.address.pincode}`}
+                  {`${user?.address?.building},  ${user?.address?.city},  ${user?.address?.taluka},  ${user?.address?.district},  ${user?.address?.state}-  ${user.address?.pincode}`}
                 </h2>
               </div>
             </div>
@@ -153,7 +153,7 @@ const DoctorProfile = (props) => {
             <div className="flex mt-4">
               <img src={speciality} className="h-6 w-6" />
               <h1 className="ml-4">
-                {user?.specialization.map((i) => {
+                {user?.specialization?.map((i) => {
                   return `${i.special}  `;
                 })}
               </h1>
@@ -165,7 +165,7 @@ const DoctorProfile = (props) => {
             </h1>
             <div className="flex mt-4 ">
               <img src={hospital} className="h-6 w-6" />
-              <h1 className="ml-4"> {user.org}</h1>
+              <h1 className="ml-4"> {user?.org}</h1>
             </div>
 
             <div className="flex mt-3">
@@ -183,7 +183,7 @@ const DoctorProfile = (props) => {
               <img src={address} className="h-7 w-8" />
               <div className="ml-4 ">
                 <h2>
-                  {`${user?.orgAddress.building},  ${user?.orgAddress.city},  ${user?.orgAddress.taluka},  ${user?.orgAddress.district},  ${user?.orgAddress.state}-  ${user?.orgAddress.pincode}`}
+                  {`${user?.orgAddress?.building},  ${user?.orgAddress?.city},  ${user?.orgAddress?.taluka},  ${user?.orgAddress?.district},  ${user?.orgAddress?.state}-  ${user?.orgAddress?.pincode}`}
                 </h2>
               </div>
             </div>

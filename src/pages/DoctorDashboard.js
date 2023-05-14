@@ -151,7 +151,7 @@ const DoctorDashboard = (props) => {
                     </div>
                     <div className="">
                       <h2 className="">
-                        {user?.specialization.map((i) => {
+                        {user?.specialization?.map((i) => {
                           return `${i.special}  `;
                         })}
                       </h2>
