@@ -114,10 +114,13 @@ const PatientDashboard = (props) => {
     const formData = new FormData();
     formData.append("image", file);
     handleOpen();
-    const response = await fetch("http://127.0.0.1:5000/predict", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetch(
+      "https://model-dep-p6krxdsipq-ey.a.run.app/predict",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
     const result = await response.json();
     console.log(result.result);
