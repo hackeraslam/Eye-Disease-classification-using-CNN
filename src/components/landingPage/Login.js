@@ -111,11 +111,7 @@ export default function Login(props) {
           .then(() => {
             setLoading(false);
             navigate("/admin/dashboard");
-            props.settoastCondition({
-              status: "success",
-              message: "Logged in Successfully!!!",
-            });
-            props.setToastShow(true);
+            alert("Login Sucessfull");
           })
           .catch((error) => {
             // navigate("/");

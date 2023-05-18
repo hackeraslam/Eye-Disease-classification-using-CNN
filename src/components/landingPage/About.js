@@ -2,11 +2,14 @@ import Footer from "./Footer";
 import Navbar from "./Navbar";
 import name from "../../assets/img/dashboard/admin-user.png";
 import email from "../../assets/img/dashboard/admin-email.png";
-import admin_1 from "../../assets/img/dashboard/admin-1.jpg";
+// import admin_1 from "../../assets/img/dashboard/admin-1.jpg";
 import admin_git from "../../assets/img/dashboard/admin-git.png";
 import admin_insta from "../../assets/img/dashboard/admin-insta-2.png";
 import admin_linkedin from "../../assets/img/dashboard/admin-linkedin.png";
 import admin_card_profile from "../../assets/img/dashboard/admin-card-profile.png";
+import admin_1 from "../../assets/img/dashboard/admin-1.jpg";
+import admin_2 from "../../assets/img/dashboard/admin-2.jpg";
+import admin_3 from "../../assets/img/dashboard/admin-3.jpg";
 const About = () => {
   return (
     <div className="body  lg:overflow-hidden lg:h-screen max-h-min flex flex-col h-screen">
@@ -21,11 +24,11 @@ const About = () => {
             <h1 className="flex justify-center font-bold text-xl">
               -- Developers --
             </h1>
-            <div className=" grid grid-cols-4 ml-20 mt-12">
-              <div className="shadow-sm border-2 mt-6 p-4 rounded-md w-9/12 hover:shadow-xl">
+            <div className=" grid grid-cols-3 ml-20 mt-12">
+              <div className="shadow-sm border-2 mt-6 p-4 rounded-md w-10/12 hover:shadow-xl">
                 <div className="flex justify-center">
                   <img
-                    src={admin_card_profile}
+                    src={admin_1}
                     alt="admin_profile"
                     className="h-40 w-40 rounded-full border-2"
                   ></img>
@@ -47,7 +50,7 @@ const About = () => {
                         alt="insta"
                       ></img>
                     </a>
-                    <a href="https://github.com/">
+                    <a href="https://github.com/hackeraslam">
                       <img src={admin_git} className="h-5 w-5" alt="git"></img>
                     </a>
                     <a href="https://www.linkedin.com/">
@@ -63,7 +66,7 @@ const About = () => {
               <div className="shadow-sm border-2 mt-6 p-4 rounded-md w-9/12 hover:shadow-xl">
                 <div className="flex justify-center">
                   <img
-                    src={admin_card_profile}
+                    src={admin_3}
                     alt="admin_profile"
                     className="h-40 w-40 rounded-full border-2"
                   ></img>
@@ -101,7 +104,7 @@ const About = () => {
               <div className="shadow-sm border-2 mt-6 p-4 rounded-md w-9/12 hover:shadow-xl">
                 <div className="flex justify-center">
                   <img
-                    src={admin_card_profile}
+                    src={admin_2}
                     alt="admin_profile"
                     className="h-40 w-40 rounded-full border-2"
                   ></img>
@@ -136,7 +139,7 @@ const About = () => {
                   </div>
                 </div>
               </div>
-              <div className="shadow-sm border-2 mt-6 p-4 rounded-md w-9/12 hover:shadow-xl">
+              {/* <div className="shadow-sm border-2 mt-6 p-4 rounded-md w-9/12 hover:shadow-xl">
                 <div className="flex justify-center">
                   <img
                     src={admin_card_profile}
@@ -144,7 +147,7 @@ const About = () => {
                     className="h-40 w-40 rounded-full border-2 "
                   ></img>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

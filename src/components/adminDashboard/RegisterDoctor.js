@@ -78,59 +78,16 @@ export default function Register(props) {
             address: doctor.address,
             type: "doctor",
           });
+          alert("Account Created Sucessfully");
         } catch (e) {
           console.log("INternal : ", e);
+          alert("Error: ", e);
         }
       })
       .catch((e) => {
-        props.settoastCondition({
-          status: "error",
-          message: e,
-        });
-        props.setToastShow(true);
+        alert("Error: ", e);
       });
   }
-
-  // const handleRegisterDoctor = async (e) => {
-  //   e.preventDefault();
-  //   setPasswordError("");
-  //   if (doctor.password === confirmPassword) {
-  //     setLoading(true);
-  //     const res = await fetch("/register/doctor", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(doctor),
-  //     });
-
-  //     const data = await res.json();
-  //     if (data.AuthError) {
-  //       props.settoastCondition({
-  //         status: "info",
-  //         message: "Please Login to proceed!!!",
-  //       });
-  //       props.setToastShow(true);
-  //       navigate("/");
-  //     } else if (data.err) {
-  //       props.settoastCondition({
-  //         status: "error",
-  //         message: "Please enter all field properly!!!",
-  //       });
-  //       props.setToastShow(true);
-  //     } else {
-  //       setLoading(false);
-  //       props.settoastCondition({
-  //         status: "success",
-  //         message: "Doctor Registration done Successfully!!!",
-  //       });
-  //       props.setToastShow(true);
-  //       navigate("/admin/dashboard");
-  //     }
-  //   } else {
-  //     setPasswordError("Password Doesn't Matches");
-  //   }
-  // };
 
   return (
     <div class="body col-span-10 h-screen overflow-y-scroll">

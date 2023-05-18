@@ -62,7 +62,7 @@ const AdminDashboard = (props) => {
                   alt="profile"
                 ></img>
                 <div className="flex items-center ml-4  font-bold font-poppins">
-                  <h1>{adminEmail} </h1>
+                  <h1>admin@admin.com </h1>
                 </div>
               </div>
             </div>

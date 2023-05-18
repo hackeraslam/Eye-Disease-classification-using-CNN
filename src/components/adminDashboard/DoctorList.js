@@ -1,10 +1,30 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DoctorListCompo from "./DoctorListCompo";
+import { getDatabase, ref, set, get } from "firebase/database";
+
 const DoctorList = (props) => {
   const navigate = useNavigate();
   const [doctorList, setDoctorList] = useState([]);
+  const database = getDatabase();
+  useEffect(() => {
+    // Fetch all patients once
+    const fetchPatients = async () => {
+      try {
+        const patientsRef = ref(database, "doctors");
+        const snapshot = await get(patientsRef);
+        const patientsData = snapshot.val();
+        if (patientsData) {
+          const patientsArray = Object.values(patientsData);
+          setDoctorList(patientsArray);
+        }
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    };
 
+    fetchPatients();
+  }, []);
   return (
     <div className="m-4 mt-4 font-poppins col-span-10">
       <div>
@@ -24,12 +44,12 @@ const DoctorList = (props) => {
           doctorList.map((doctor, index) => {
             return (
               <DoctorListCompo
-                key={doctor._id}
+                key={doctor.cnic}
                 doctor={doctor}
                 index={index}
-                id={doctor._id}
-                settoastCondition={props.settoastCondition}
-                setToastShow={props.setToastShow}
+                id={doctor.emails}
+                // settoastCondition={props.settoastCondition}
+                // setToastShow={props.setToastShow}
               />
             );
           })
